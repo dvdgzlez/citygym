@@ -1,0 +1,17 @@
+package controlador;
+
+import java.awt.Frame;
+
+import javax.swing.JLabel;
+
+import vista.Global;
+
+public class ColocarAsterisco {
+	private Global global = new Global();
+	public void Asterisco(int x, int y, Frame frame) {
+		JLabel label = new JLabel("*");
+		label.setForeground(global.colorRojoOscuro());
+		label.setBounds(x, y, 25, 25);
+		frame.add(label);
+	}
+}
