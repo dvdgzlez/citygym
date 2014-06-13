@@ -1,0 +1,390 @@
+package modelo;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import vista.Global;
+
+public class DAO {
+
+	private static Sesion ss = new Sesion();
+	public static Global global = new Global();
+	/**
+	 * Atributos de la clase DAO
+	 */
+	private static Connection con;
+	private static DAO INSTANCE = null;
+
+	/**
+	 * constructor
+	 */
+	public DAO() {
+
+	}
+
+	/**
+	 * Datos de la conexi�n
+	 */
+	public static boolean performConnection() {
+		String host = "127.0.0.1:3308";
+		String user = "root";
+		String pass = "Tolsimir1646.";
+		String dtbs = "citygym";
+
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String newConnectionURL = "jdbc:mysql://" + host + "/" + dtbs;
+			con = DriverManager.getConnection(newConnectionURL, user, pass);
+			// System.out.println(newConnectionURL);
+		} catch (Exception e) {
+			System.out.println("Error de conexi�n.");
+			return false;
+		}
+		return true;
+
+	}
+
+	/**
+	 * crea una instancia de conexi�n
+	 */
+	private synchronized static void createInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new DAO();
+			if (!performConnection()) {
+				INSTANCE = null;
+			}
+		}
+	}
+
+	/**
+	 * metodo para obtener una instancia, si ya existe la retorna sino la crea
+	 * 
+	 * @return instancia si existeix
+	 */
+	public static DAO getInstance() {
+		if (INSTANCE == null)
+			createInstance();
+		// System.out.println(INSTANCE);
+		return INSTANCE;
+	}
+
+	/**
+	 * M�todo para cerrar la conexi�n
+	 */
+	public void closeConnection() {
+		try {
+			con.close();
+		} catch (Exception e) {
+			System.out.println("Error al terminar conexi�n.");
+		}
+	}
+
+	public boolean validarUsuario(String usuario, String contrasena)
+			throws SQLException {
+
+		PreparedStatement ps = con
+				.prepareStatement("SELECT * FROM Usuario WHERE `usuario` = '"
+						+ usuario + "' AND `contraseña` = '" + contrasena + "'");
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			rs.close();
+			return true;
+		}
+		rs.close();
+		return false;
+	}
+
+	public int existeUsuario(String usuario) throws SQLException {
+		PreparedStatement ps = con
+				.prepareStatement("SELECT * FROM Usuario WHERE `usuario` = '"
+						+ usuario + "'");
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			rs.close();
+			return 1;
+		}
+		rs.close();
+		return 0;
+	}
+
+	public int existeCedula(String CI) throws SQLException {
+		PreparedStatement ps = con
+				.prepareStatement("SELECT * FROM Usuario WHERE `idUsuario` = '"
+						+ CI + "'");
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			rs.close();
+			return 1;
+		}
+		rs.close();
+		return 0;
+	}
+
+	public int existeInscrito(String CI) throws SQLException {
+		PreparedStatement ps = con
+				.prepareStatement("SELECT * FROM Inscrito WHERE `idInscrito` = '"
+						+ CI + "'");
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			rs.close();
+			return 1;
+		}
+		rs.close();
+		return 0;
+	}
+
+	public void crearUsuario(String nombre, String apellido, String nacion,
+			String CI, String usuario, String contrasena) throws SQLException {
+		String seleccio = "INSERT INTO `Usuario` (`nombre`,`apellido`,`nacionalidad`,`idUsuario`,`usuario`,`contrase�a`,`fecha_acceso`)VALUES (?,?,?,?,?,?,?)";
+		// System.out.println(seleccio);
+
+		PreparedStatement ps = con.prepareStatement(seleccio);
+		java.sql.Date sql_fecha = global.obtenerFechaActual();
+
+		ps.setString(1, nombre);
+		ps.setString(2, apellido);
+		ps.setString(3, nacion);
+		ps.setString(4, CI);
+		ps.setString(5, usuario);
+		ps.setString(6, contrasena);
+		ps.setDate(7, sql_fecha);
+		ps.executeUpdate();
+	}
+
+	public void crearInscrito(String nombre, String apellido,
+			String nacionalidad, String cedula, String fecha_nacimiento,
+			String sexo, String telefono, String telefono2, String direccion,
+			String fecha_inscripcion, String nombre_emergencia,
+			String telefono_emergencia) throws SQLException {
+		String seleccio = "INSERT INTO `Inscrito` (`nombre`,`apellido`,`nacionalidad`,`idInscrito`,`fecha_nacimiento`,`sexo`,`telefono1`,`telefono2`,`direccion`,`fecha_inscripci�n`,`nombre_emer`,`telefono_emer`,`inscritoEstatus`)VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+		PreparedStatement ps;
+		ps = con.prepareStatement(seleccio);
+
+		ps.setString(1, nombre);
+		ps.setString(2, apellido);
+		ps.setString(3, nacionalidad);
+		ps.setString(4, cedula);
+		ps.setString(5, fecha_nacimiento);
+		ps.setString(6, sexo);
+		ps.setString(7, telefono);
+		ps.setString(8, telefono2);
+		ps.setString(9, direccion);
+		ps.setString(10, fecha_inscripcion);
+		ps.setString(11, nombre_emergencia);
+		ps.setString(12, telefono_emergencia);
+		ps.setBoolean(13, true);
+		ps.executeUpdate();
+	}
+
+	public void obtenerUsuario(String usuario) throws SQLException {
+		// System.out.println(seleccio);
+
+		PreparedStatement ps = con
+				.prepareStatement("SELECT * FROM Usuario WHERE `usuario` = '"
+						+ usuario + "'");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			ss.ingresarNombre(new StringBuffer(rs.getString("nombre")));
+			ss.ingresarApellido(new StringBuffer(rs.getString("apellido")));
+			ss.ingresarCedula(rs.getInt("idUsuario"));
+			ss.ingresarUsuario(new StringBuffer(rs.getString("usuario")));
+		}
+	}
+
+	public ArrayList<Socio> obtenerInscritos() throws SQLException {
+		ArrayList<Socio> lista_socio = new ArrayList<Socio>();
+		PreparedStatement ps;
+		ps = con.prepareStatement("SELECT * FROM Inscrito");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			lista_socio.add(new Socio(new StringBuffer(rs.getString("nombre")),
+					new StringBuffer(rs.getString("apellido")), rs
+							.getInt("idInscrito"), new StringBuffer(rs
+							.getString("nacionalidad")), rs
+							.getDate("fecha_nacimiento"), new StringBuffer(rs
+							.getString("sexo")), new StringBuffer(rs
+							.getString("direccion")), new StringBuffer(rs
+							.getString("telefono1")), new StringBuffer(rs
+							.getString("telefono2")), rs
+							.getDate("fecha_inscripci�n"), new StringBuffer(rs
+							.getString("nombre_emer")), new StringBuffer(rs
+							.getString("telefono_emer")), rs
+							.getBoolean("inscritoEstatus")));
+		}
+		rs.close();
+		return lista_socio;
+	}
+
+	public ArrayList<Socio> obtenerSocio(String nacionalidad, String cedula)
+			throws SQLException {
+		ArrayList<Socio> lista_socio = new ArrayList<Socio>();
+		PreparedStatement ps;
+		ps = con.prepareStatement("SELECT nombre, apellido, idInscrito, nacionalidad FROM Inscrito WHERE `idInscrito` = '"
+				+ cedula + "' AND `nacionalidad` = '" + nacionalidad + "'");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			lista_socio.add(new Socio(new StringBuffer(rs.getString("nombre")),
+					new StringBuffer(rs.getString("apellido")), rs
+							.getInt("idInscrito"), new StringBuffer(rs
+							.getString("nacionalidad"))));
+		}
+		rs.close();
+		return lista_socio;
+	}
+
+	public ArrayList<Socio> obtenerSocio2(int cedula) throws SQLException {
+		ArrayList<Socio> lista_socio = new ArrayList<Socio>();
+		PreparedStatement ps;
+		ps = con.prepareStatement("SELECT * FROM Inscrito WHERE `idInscrito` = '"
+				+ cedula + "'");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			lista_socio.add(new Socio(new StringBuffer(rs.getString("nombre")),
+					new StringBuffer(rs.getString("apellido")), rs
+							.getInt("idInscrito"), new StringBuffer(rs
+							.getString("nacionalidad")), rs
+							.getDate("fecha_nacimiento"), new StringBuffer(rs
+							.getString("sexo")), new StringBuffer(rs
+							.getString("direccion")), new StringBuffer(rs
+							.getString("telefono1")), new StringBuffer(rs
+							.getString("telefono2")), rs
+							.getDate("fecha_inscripci�n"), new StringBuffer(rs
+							.getString("nombre_emer")), new StringBuffer(rs
+							.getString("telefono_emer")), rs
+							.getBoolean("inscritoEstatus")));
+		}
+		rs.close();
+		return lista_socio;
+	}
+
+	public void guardarPago(int usuario, int cedula, float valorMensualidad,
+			float valorInscripcion, long cheque, String banco_elegido,
+			Date fecha_pago, Date fecha_inicio, Date fecha_corte,
+			String conceptoFinal) throws SQLException {
+		String seleccio = "INSERT INTO `informe` (`idUsuario`,`id_inscrito`,`monto_inscrito`,`monto_mensualidad`,`fecha_pago`,`fecha_inicio`,`fecha_corte`,`banco`,`numero_cheque`,`concepto`)VALUES (?,?,?,?,?,?,?,?,?,?)";
+		// System.out.println(seleccio);
+
+		PreparedStatement ps = con.prepareStatement(seleccio);
+
+		ps.setInt(1, usuario);
+		ps.setInt(2, cedula);
+		ps.setFloat(3, valorInscripcion);
+		ps.setFloat(4, valorMensualidad);
+		ps.setDate(5, fecha_pago);
+		ps.setDate(6, fecha_inicio);
+		ps.setDate(7, fecha_corte);
+		ps.setString(8, banco_elegido);
+		ps.setLong(9, cheque);
+		ps.setString(10, conceptoFinal);
+		ps.executeUpdate();
+
+	}
+
+	public Date obtenerSocioFechaInsc(int ced) throws SQLException {
+		java.sql.Date sqlDate = null;
+		PreparedStatement ps;
+		ps = con.prepareStatement("SELECT fecha_inscripci�n FROM Inscrito WHERE `idInscrito` = '"
+				+ ced + "'");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			sqlDate = rs.getDate("fecha_inscripci�n");
+		}
+		rs.close();
+		return sqlDate;
+	}
+
+	public Date obtenerInformeFechaCorte(int ced) throws SQLException {
+		java.sql.Date sqlDate = null;
+		PreparedStatement ps;
+		ps = con.prepareStatement("SELECT fecha_corte FROM Informe WHERE `id_inscrito` = '"
+				+ ced + "' ORDER BY id_inscrito ASC");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			sqlDate = rs.getDate("fecha_corte");
+		}
+		rs.close();
+		return sqlDate;
+	}
+
+	public void actualizarSocioReintegro(int cedula, Date fecha_inicio)
+			throws SQLException {
+		String seleccio = "UPDATE inscrito SET fecha_inscripci�n = ?, inscritoEstatus = ? WHERE idInscrito = '"
+				+ cedula + "'";
+
+		PreparedStatement ps = con.prepareStatement(seleccio);
+		ps.setDate(1, fecha_inicio);
+		ps.setBoolean(2, true);
+		ps.executeUpdate();
+	}
+
+	public void actualizarSocioBaja(int cedula) throws SQLException {
+		String seleccio = "UPDATE inscrito SET inscritoEstatus = 0 WHERE idInscrito = '"
+				+ cedula + "'";
+
+		PreparedStatement ps = con.prepareStatement(seleccio);
+
+		ps.executeUpdate();
+	}
+
+	public void borrarSocio(int cedula) throws SQLException {
+		String seleccio = "DELETE FROM inscrito WHERE idInscrito = '" + cedula
+				+ "'";
+
+		PreparedStatement ps = con.prepareStatement(seleccio);
+		ps.executeUpdate();
+	}
+
+	public void actualizarInscrito(String nombre, String apellido,
+			String nacionalidad, String cedula, String fecha_nacimiento,
+			String sexo, String telefono1, String telefono2, String direccion,
+			String fecha_inscripcion, String nombre_emer, String telefono_emer, String cedula_anterior)
+			throws SQLException {
+		String seleccio = "UPDATE inscrito SET nombre = '" + nombre
+				+ "', apellido = '" + apellido + "', nacionalidad = '"
+				+ nacionalidad + "', fecha_inscripci�n = '" + fecha_inscripcion
+				+ "', direccion = '" + direccion + "', fecha_nacimiento = '"
+				+ fecha_nacimiento + "', sexo = '" + sexo + "', telefono1 = '"
+				+ telefono1 + "', telefono2 = '" + telefono2
+				+ "', nombre_emer = '" + nombre_emer + "', telefono_emer = '"
+				+ telefono_emer + "' WHERE idInscrito = '" + cedula + "'";
+
+		PreparedStatement ps = con.prepareStatement(seleccio);
+
+		ps.executeUpdate();
+		String seleccion = "UPDATE informe SET id_inscrito = '"+cedula+"' WHERE id_inscrito = '"+cedula_anterior+"'";
+		
+		ps = con.prepareStatement(seleccion);
+		
+		ps.executeUpdate();
+	}
+	
+	public ArrayList<Socio> verPagos(String nacionalidad, String cedula) throws SQLException{
+		ArrayList<Socio> lista_socio = new ArrayList<Socio>();
+		PreparedStatement ps;
+		ps = con.prepareStatement("SELECT * FROM Inscrito");
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			lista_socio.add(new Socio(new StringBuffer(rs.getString("nombre")),
+					new StringBuffer(rs.getString("apellido")), rs
+							.getInt("idInscrito"), new StringBuffer(rs
+							.getString("nacionalidad")), rs
+							.getDate("fecha_nacimiento"), new StringBuffer(rs
+							.getString("sexo")), new StringBuffer(rs
+							.getString("direccion")), new StringBuffer(rs
+							.getString("telefono1")), new StringBuffer(rs
+							.getString("telefono2")), rs
+							.getDate("fecha_inscripci�n"), new StringBuffer(rs
+							.getString("nombre_emer")), new StringBuffer(rs
+							.getString("telefono_emer")), rs
+							.getBoolean("inscritoEstatus")));
+		}
+		rs.close();
+		return lista_socio;
+	}
+}
