@@ -1,0 +1,32 @@
+package controlador;
+
+public class Bancos {
+	private static String[] bancos = {
+		"100% Banco",
+		"Bancaribe",
+		"Banco Activo",
+		"Banco Agrícola de Venezuela",
+		"Banco Caroní",
+		"Banco de Venezuela",
+		"Banco del Tesoro",
+		"Banco Exterior",
+		"Banco Industrial de Venezuela",
+		"Banco Mercantil",
+		"Banco Nacional de Crédito BNC",
+		"Banco Occidental de Descuento BOD",
+		"Banco Plaza",
+		"Banco Sofitasa",
+		"Banesco",
+		"Banplus",
+		"BBVA Banco Provincial",
+		"BFC",
+		"Bicentenario Banco Universal",
+		"Citibank",
+		"Corp Banca BOD",
+		"Del Sur",
+		"Venezolano de Crédito"
+	};
+	public String[] deVenezuela(){
+		return bancos;
+	}
+}
