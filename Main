@@ -1,0 +1,14 @@
+import vista.Inicio;
+
+public class Main {
+
+	/*
+	 * En la funcion main iniciare con una pantalla de login, para el inicio
+   * de sesion de usuarios registrados
+	 */
+	public static void main(String[] args) {
+		Inicio v = new Inicio();
+		v.inicio_sesion();
+	}// fin de la funci�n main
+
+}// fin de la clase Main
