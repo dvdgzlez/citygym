@@ -1,0 +1,166 @@
+package modelo;
+
+import java.sql.Date;
+import java.sql.SQLException;
+
+public class Socio {
+	private StringBuffer nombre;
+	private StringBuffer apellido;
+	private int cedula;
+	private StringBuffer nacionalidad;
+	private Date fecha_nacimiento;
+	private StringBuffer sexo;
+	private StringBuffer direccion;
+	private StringBuffer telefono1;
+	private StringBuffer telefono2;
+	private Date fecha_inscripcion;
+	private StringBuffer nombre_emer;
+	private StringBuffer telefono_emer;
+	private boolean status;
+	private DAO mc = new DAO();
+
+	public Socio() {
+	}
+
+	public Socio(StringBuffer nombre, StringBuffer apellido, int cedula,
+			StringBuffer nacionalidad, Date fecha_nacimiento,
+			StringBuffer sexo, StringBuffer direccion, StringBuffer telefono1,
+			StringBuffer telefono2, Date fecha_inscripcion,
+			StringBuffer nombre_emer, StringBuffer telefono_emer, boolean status) {
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.cedula = cedula;
+		this.nacionalidad = nacionalidad;
+		this.fecha_inscripcion = fecha_inscripcion;
+		this.fecha_nacimiento = fecha_nacimiento;
+		this.sexo = sexo;
+		this.direccion = direccion;
+		this.telefono1 = telefono1;
+		this.telefono2 = telefono2;
+		this.nombre_emer = nombre_emer;
+		this.telefono_emer = telefono_emer;
+		this.status = status;
+	}
+
+	public Socio(StringBuffer nombre, StringBuffer apellido, int cedula,
+			StringBuffer nacionalidad) {
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.cedula = cedula;
+		this.nacionalidad = nacionalidad;
+	}
+
+	public void ingresarNombre(StringBuffer valor) {
+		nombre = valor;
+	}
+
+	public StringBuffer obtenerNombre() {
+		return nombre;
+	}
+
+	public void ingresarApellido(StringBuffer valor) {
+		apellido = valor;
+	}
+
+	public StringBuffer obtenerApellido() {
+		return apellido;
+	}
+
+	public void ingresarCedula(int valor) {
+		cedula = valor;
+	}
+
+	public int obtenerCedula() {
+		return cedula;
+	}
+
+	public void ingresarNacionalidad(StringBuffer valor) {
+		nacionalidad = valor;
+	}
+
+	public StringBuffer obtenerNacionalidad() {
+		return nacionalidad;
+	}
+
+	public void ingresarFechaNac(Date valor) {
+		fecha_nacimiento = valor;
+	}
+
+	public Date obtenerFechaNac() {
+		return fecha_nacimiento;
+	}
+
+	public void ingresarSexo(StringBuffer valor) {
+		sexo = valor;
+	}
+
+	public StringBuffer obtenerSexo() {
+		return sexo;
+	}
+
+	public void ingresarTelefono1(StringBuffer valor) {
+		telefono1 = valor;
+	}
+
+	public StringBuffer obtenerTelefono1() {
+		return telefono1;
+	}
+
+	public void ingresarTelefono2(StringBuffer valor) {
+		telefono2 = valor;
+	}
+
+	public StringBuffer obtenerTelefono2() {
+		return telefono2;
+	}
+
+	public void ingresarDireccion(StringBuffer valor) {
+		direccion = valor;
+	}
+
+	public StringBuffer obtenerDireccion() {
+		return direccion;
+	}
+
+	public void ingresarFechaInsc(Date valor) {
+		fecha_inscripcion = valor;
+	}
+
+	public Date obtenerFechaInsc() {
+		return fecha_inscripcion;
+	}
+
+	public void ingresarNombreEmer(StringBuffer valor) {
+		nombre_emer = valor;
+	}
+
+	public StringBuffer obtenerNombreEmer() {
+		return nombre_emer;
+	}
+
+	public void ingresarTelefonoEmer(StringBuffer valor) {
+		telefono_emer = valor;
+	}
+
+	public StringBuffer obtenerTelefonoEmer() {
+		return telefono_emer;
+	}
+
+	public void ingresarEstatus(boolean valor) {
+		status = valor;
+	}
+
+	public boolean obtenerEstatus() {
+		return status;
+	}
+
+	public java.util.Date obtenerFechaCorte(int obtenerCedula) {
+		java.util.Date fecha = null;
+		try {
+			fecha = mc.obtenerInformeFechaCorte(obtenerCedula);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return fecha;
+	}
+}
