@@ -1,0 +1,692 @@
+package vista;
+
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
+import com.toedter.calendar.JDateChooser;
+
+import controlador.ColocarAsterisco;
+import controlador.IntegerTextField;
+import controlador.JTextFieldLimit;
+import controlador.LetterTextField;
+import controlador.Validacion;
+
+public class Inscribir {
+
+	private static int ancho = 420;
+	private static int alto = 620;
+	private static int pos_x = 50;
+	private static int pos_y = 100;
+
+	private static Global global = new Global();
+	private static Pagos pagar = new Pagos();
+	private static ColocarAsterisco colocar = new ColocarAsterisco();
+
+	/*
+	 * Esta función crea la interfaz gráfica para el Registro de Nuevos Usuarios
+	 */
+	public Frame Nuevo(final JFrame frameViejo) {
+		pos_x = 50;
+		pos_y = 100;
+		final JFrame frame = new JFrame("City Gym - Inscribir");
+		frame.setContentPane(new JLabel(global.bg_2()));
+		frame.setSize(ancho, alto);
+		placeComponents(frame, frameViejo);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		Centrar centrar = new Centrar();
+		centrar.centreWindow(frame);
+		frame.setResizable(false);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				frameViejo.setVisible(true);
+				frame.dispose();
+			}
+
+		});
+		JLabel bg_1 = new JLabel(global.bgInscripcion());
+		bg_1.setBounds(35, 30, 340, 486);
+		frame.add(bg_1);
+		return frame;
+	}// fin de la función NuevoUsuario
+
+	/*
+	 * Esta funcion coloca en pantalla los campos para Nombre, Apellido, C.I.,
+	 * Usuario, Contraseña, Validar Contraseña Además de los eventos de los
+	 * botones Registrar y Volver
+	 */
+
+	static JButton inscribirButton = new JButton(global.boton_inscribir1());
+	static JButton volverButton = new JButton(global.volver1());
+	static JLabel warn_1 = new JLabel();
+	static JLabel warn_2 = new JLabel();
+	static JLabel warn_3 = new JLabel();
+	static JLabel warn_4 = new JLabel();
+	static JLabel warn_5 = new JLabel();
+	static JLabel warn_6 = new JLabel();
+	static JLabel warn_7 = new JLabel();
+	static JLabel warn_8 = new JLabel();
+
+	private static void placeComponents(final JFrame frame,
+			final JFrame frameViejo) {
+
+		frame.setLayout(null);
+
+		// Campo de Nombre
+		JLabel nombreLabel = new JLabel("Nombre");
+		nombreLabel.setForeground(global.colorPlateado());
+		nombreLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(nombreLabel);
+		colocar.Asterisco(pos_x + nombreLabel.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final LetterTextField nombreText = new LetterTextField(20);
+		nombreText.setBounds(pos_x + 130, pos_y, 160, 25);
+		nombreText.setDocument(new JTextFieldLimit(45));
+		nombreText.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (nombreText.getText().trim().isEmpty()) {
+					nombreText.setText("");
+				} else {
+					warn_1.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(nombreText);
+
+		warn_1.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_1);
+
+		// Campo de Apellido
+		pos_y += 30;
+		JLabel apellidoLabel = new JLabel("Apellido");
+		apellidoLabel.setForeground(global.colorPlateado());
+		apellidoLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(apellidoLabel);
+		colocar.Asterisco(pos_x + apellidoLabel.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final LetterTextField apellidoText = new LetterTextField(20);
+		apellidoText.setBounds(pos_x + 130, pos_y, 160, 25);
+		apellidoText.setDocument(new JTextFieldLimit(45));
+		apellidoText.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (apellidoText.getText().trim().isEmpty()) {
+					apellidoText.setText("");
+				} else {
+					warn_2.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(apellidoText);
+
+		warn_2.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_2);
+
+		// Campo de C.I.
+		pos_y += 30;
+		JLabel cedulaLabel = new JLabel("C.I.");
+		cedulaLabel.setForeground(global.colorPlateado());
+		cedulaLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(cedulaLabel);
+		colocar.Asterisco(pos_x + cedulaLabel.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final String[] CI = { "V", "E" };
+		final JComboBox<?> cedula = new JComboBox<Object>(CI);
+		cedula.setSelectedIndex(0);
+		cedula.setBounds(pos_x + 130, pos_y, 50, 25);
+		frame.add(cedula);
+
+		JLabel guionLabel = new JLabel("-");
+		guionLabel.setForeground(global.colorPlateado());
+		guionLabel.setBounds(pos_x + 182, pos_y, 25, 25);
+		frame.add(guionLabel);
+
+		final IntegerTextField cedulaText = new IntegerTextField(10);
+		cedulaText.setBounds(pos_x + 190, pos_y, 100, 25);
+		cedulaText.setDocument(new JTextFieldLimit(10));
+		cedulaText.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (cedulaText.getText().trim().isEmpty()) {
+					cedulaText.setText("");
+				} else {
+					warn_3.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(cedulaText);
+
+		warn_3.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_3);
+
+		// Campo de Fecha de Nacimiento
+		pos_y += 30;
+		JLabel nacLabel = new JLabel("Fecha de Nacimiento");
+		nacLabel.setForeground(global.colorPlateado());
+		nacLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(nacLabel);
+		colocar.Asterisco(pos_x + nacLabel.getPreferredSize().width + 5, pos_y,
+				frame);
+
+		final JDateChooser fecha_nac = new JDateChooser();
+		fecha_nac.setBounds(pos_x + 130, pos_y, 120, 25);
+		fecha_nac.setDate(global.obtenerFechaActual());
+		fecha_nac.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (fecha_nac.getToolTipText().trim().isEmpty()) {
+					fecha_nac.setToolTipText("");
+				} else {
+					warn_4.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(fecha_nac);
+
+		warn_4.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_4);
+
+		// Campo de Sexo
+		pos_y += 30;
+		JLabel sexoLabel = new JLabel("Sexo");
+		sexoLabel.setForeground(global.colorPlateado());
+		sexoLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(sexoLabel);
+		colocar.Asterisco(pos_x + sexoLabel.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final JRadioButton sexo_button = new JRadioButton("M");
+		sexo_button.setBounds(pos_x + 130, pos_y, 50, 25);
+		sexo_button.setBorderPainted(false);
+		sexo_button.setOpaque(false);
+		sexo_button.setForeground(global.colorPlateado());
+		sexo_button.setSelected(true);
+		frame.add(sexo_button);
+		final JRadioButton sexo_button2 = new JRadioButton("F");
+		sexo_button2.setBounds(pos_x + 180, pos_y, 50, 25);
+		sexo_button2.setOpaque(false);
+		sexo_button2.setForeground(global.colorPlateado());
+		sexo_button2.setBorderPainted(false);
+		frame.add(sexo_button2);
+
+		final ButtonGroup group = new ButtonGroup();
+		group.add(sexo_button);
+		group.add(sexo_button2);
+
+		// Campo Telefono 1
+		pos_y += 30;
+		JLabel telefonoLabel = new JLabel("Telefono 1");
+		telefonoLabel.setForeground(global.colorPlateado());
+		telefonoLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(telefonoLabel);
+		colocar.Asterisco(pos_x + telefonoLabel.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final IntegerTextField area = new IntegerTextField(4);
+		area.setBounds(pos_x + 130, pos_y, 35, 25);
+		area.setDocument(new JTextFieldLimit(4));
+		area.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (area.getText().trim().isEmpty()) {
+					area.setText("");
+				} else {
+					warn_5.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(area);
+
+		warn_5.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_5);
+
+		JLabel guion = new JLabel("-");
+		guion.setForeground(global.colorPlateado());
+		guion.setBounds(pos_x + 168, pos_y, 25, 25);
+		frame.add(guion);
+
+		final IntegerTextField telefono = new IntegerTextField(20);
+		telefono.setBounds(pos_x + 175, pos_y, 65, 25);
+		telefono.setDocument(new JTextFieldLimit(7));
+		telefono.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (telefono.getText().trim().isEmpty()) {
+					telefono.setText("");
+				} else {
+					warn_5.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(telefono);
+
+		// Campo Telefono 2
+		pos_y += 30;
+		JLabel telefonoLabel2 = new JLabel("Telefono 2");
+		telefonoLabel2.setForeground(global.colorPlateado());
+		telefonoLabel2.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(telefonoLabel2);
+
+		final IntegerTextField area2 = new IntegerTextField(4);
+		area2.setBounds(pos_x + 130, pos_y, 35, 25);
+		area2.setDocument(new JTextFieldLimit(4));
+		area2.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (area2.getText().trim().isEmpty()) {
+					area2.setText("");
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(area2);
+
+		JLabel guion2 = new JLabel("-");
+		guion2.setForeground(global.colorPlateado());
+		guion2.setBounds(pos_x + 168, pos_y, 25, 25);
+		frame.add(guion2);
+
+		final IntegerTextField telefono2 = new IntegerTextField(20);
+		telefono2.setBounds(pos_x + 175, pos_y, 65, 25);
+		telefono2.setDocument(new JTextFieldLimit(7));
+		telefono2.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (telefono2.getText().trim().isEmpty()) {
+					telefono2.setText("");
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(telefono2);
+
+		// Campo Dirección
+		pos_y += 30;
+		JLabel direccionLabel = new JLabel("Dirección");
+		direccionLabel.setForeground(global.colorPlateado());
+		direccionLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(direccionLabel);
+
+		final JTextArea direccionText = new JTextArea(5, 31);
+		direccionText.setBounds(pos_x + 130, pos_y, 160, 50);
+		direccionText.setLineWrap(true);
+		direccionText.setWrapStyleWord(true);
+		direccionText.setDocument(new JTextFieldLimit(100));
+		JScrollPane sp = new JScrollPane(direccionText);
+		sp.setVisible(true);
+		sp.setBounds(pos_x + 130, pos_y, 160, 50);
+		sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		frame.getContentPane().add(sp);
+
+		// Campo de Fecha de Inscripción
+		pos_y += 60;
+		JLabel inscLabel = new JLabel("Fecha de Inscripción");
+		inscLabel.setForeground(global.colorPlateado());
+		inscLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(inscLabel);
+		colocar.Asterisco(pos_x + inscLabel.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final JDateChooser fecha_insc = new JDateChooser();
+		fecha_insc.setBounds(pos_x + 130, pos_y, 120, 25);
+		fecha_insc.setDate(global.obtenerFechaActual());
+		fecha_insc.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (fecha_insc.getToolTipText().trim().isEmpty()) {
+					fecha_insc.setToolTipText("");
+				} else {
+					warn_6.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(fecha_insc);
+
+		warn_6.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_6);
+
+		/*
+		 * EN CASO DE EMERGENCIA CODIGO!!
+		 */
+
+		// Campo Nombre de Emergencia
+		pos_y += 30;
+		JLabel emergency = new JLabel("En caso de Emergencia, llamar a:");
+		emergency.setForeground(global.colorPlateado());
+		emergency.setBounds(pos_x, pos_y, 200, 25);
+		frame.add(emergency);
+
+		pos_y += 30;
+		JLabel nombreLabel1 = new JLabel("Nombre");
+		nombreLabel1.setForeground(global.colorPlateado());
+		nombreLabel1.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(nombreLabel1);
+		colocar.Asterisco(pos_x + nombreLabel1.getPreferredSize().width + 5,
+				pos_y, frame);
+
+		final LetterTextField nombreEmerText = new LetterTextField(20);
+		nombreEmerText.setBounds(pos_x + 130, pos_y, 160, 25);
+		nombreEmerText.setDocument(new JTextFieldLimit(45));
+		nombreEmerText.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (nombreEmerText.getText().trim().isEmpty()) {
+					nombreEmerText.setText("");
+				} else {
+					warn_7.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(nombreEmerText);
+
+		warn_7.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_7);
+
+		// Campo Telefono
+		pos_y += 40;
+		JLabel telefonoEmerLabel = new JLabel("Telefono");
+		telefonoEmerLabel.setForeground(global.colorPlateado());
+		telefonoEmerLabel.setBounds(pos_x, pos_y, 120, 25);
+		frame.add(telefonoEmerLabel);
+		colocar.Asterisco(pos_x + telefonoEmerLabel.getPreferredSize().width
+				+ 5, pos_y, frame);
+
+		final IntegerTextField areaEmer = new IntegerTextField(4);
+		areaEmer.setBounds(pos_x + 130, pos_y, 35, 25);
+		areaEmer.setDocument(new JTextFieldLimit(4));
+		areaEmer.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (areaEmer.getText().trim().isEmpty()) {
+					areaEmer.setText("");
+				} else {
+					warn_8.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(areaEmer);
+
+		JLabel guionEmer = new JLabel("-");
+		guionEmer.setForeground(global.colorPlateado());
+		guionEmer.setBounds(pos_x + 168, pos_y, 25, 25);
+		frame.add(guionEmer);
+
+		final IntegerTextField telefonoEmer = new IntegerTextField(20);
+		telefonoEmer.setBounds(pos_x + 175, pos_y, 65, 25);
+		telefonoEmer.setDocument(new JTextFieldLimit(7));
+		telefonoEmer.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (telefonoEmer.getText().trim().isEmpty()) {
+					telefonoEmer.setText("");
+				} else {
+					warn_8.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(telefonoEmer);
+
+		warn_8.setBounds(pos_x + 295, pos_y, 25, 25);
+		frame.add(warn_8);
+
+		pos_y += 65;
+
+		botonImagen(inscribirButton, pos_x + 170, pos_y);
+		inscribirButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				inscribirButton.setIcon(global.boton_inscribir1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				inscribirButton.setIcon(global.boton_inscribir3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				inscribirButton.setIcon(global.boton_inscribir1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				inscribirButton.setIcon(global.boton_inscribir2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				inscribirButton.setIcon(global.boton_inscribir2());
+				String sexo_elegido = new String();
+				if (sexo_button.isSelected()) {
+					sexo_elegido = "M";
+				} else {
+					sexo_elegido = "F";
+				}
+
+				java.sql.Date fecha_1 = global.formatearFecha(fecha_nac);
+				java.sql.Date fecha_2 = global.formatearFecha(fecha_insc);
+
+				Validacion v = new Validacion();
+				int validar = 0;
+				try {
+					validar = v.validarInscripcion(nombreText, apellidoText,
+							cedulaText, CI[cedula.getSelectedIndex()], fecha_1,
+							direccionText,
+							area.getText() + "-" + telefono.getText(),
+							area2.getText() + "-" + telefono2.getText(),
+							nombreEmerText, areaEmer.getText() + "-"
+									+ telefonoEmer.getText(), sexo_elegido,
+							fecha_2);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+
+				switch (validar) {
+				case 1: // No introdujo el nombre
+					warn_1.setIcon(global.warning());
+					nombreText.requestFocus();
+					break;
+				case 2: // No introdujo el apellido
+					warn_2.setIcon(global.warning());
+					apellidoText.requestFocus();
+					break;
+				case 3: // No introdujo la C.I.
+					warn_3.setIcon(global.warning());
+					cedulaText.requestFocus();
+					break;
+				case 4: // No introdujo fecha de nacimiento
+					warn_4.setIcon(global.warning());
+					fecha_nac.requestFocus();
+					break;
+				case 5: // No introdujo telefono 1
+					warn_5.setIcon(global.warning());
+					telefono.requestFocus();
+					break;
+				case 6: // No introdujo fecha de inscripcion
+					warn_6.setIcon(global.warning());
+					fecha_insc.requestFocus();
+					break;
+				case 7: // No introdujo nombre emergencia
+					warn_7.setIcon(global.warning());
+					nombreEmerText.requestFocus();
+					break;
+				case 8: // No introdujo telefono emergencia
+					warn_8.setIcon(global.warning());
+					telefonoEmer.requestFocus();
+					break;
+				case 9: // C.I. ya registrada
+					global.mensajePantalla(9);
+					break;
+				case 99:// Error desconocido
+					global.mensajePantalla(99);
+					break;
+				default: // Registro Satisfactorio
+					frame.setVisible(false);
+					global.mensajePantalla(100);
+					pagar.inscripcionMensualidad(frameViejo, CI[cedula.getSelectedIndex()], cedulaText.getText(), 0);
+					borrarCampos(nombreText, apellidoText, cedulaText,
+							fecha_nac, area, telefono, area2, telefono2,
+							direccionText, fecha_insc, nombreEmerText,
+							areaEmer, telefonoEmer);
+				}
+			}
+		});
+		frame.add(inscribirButton);
+
+		botonImagen(volverButton, pos_x, pos_y);
+		volverButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				volverButton.setIcon(global.volver3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				volverButton.setIcon(global.volver2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				volverButton.setIcon(global.volver2());
+			}
+		});
+		frame.add(volverButton);
+
+		volverButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				frame.setVisible(false);
+				frameViejo.setVisible(true);
+				frame.dispose();
+				borrarCampos(nombreText, apellidoText, cedulaText, fecha_nac,
+						area, telefono, area2, telefono2, direccionText,
+						fecha_insc, nombreEmerText, areaEmer, telefonoEmer);
+			}
+		});
+
+	}
+
+	private static void botonImagen(JButton boton, int x, int y) {
+		boton.setBounds(x, y, 150, 50);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		boton.setFocusable(true);
+		boton.setFocusPainted(false);
+	}
+
+	private static void borrarCampos(JTextField nombreText,
+			JTextField apellidoText, IntegerTextField cedulaText,
+			JDateChooser fecha_nac, IntegerTextField area,
+			IntegerTextField telefono, IntegerTextField area2,
+			IntegerTextField telefono2, JTextArea direccionText,
+			JDateChooser fecha_insc, JTextField nombreEmerText,
+			IntegerTextField areaEmer, IntegerTextField telefonoEmer) {
+		nombreText.setText(null);
+		apellidoText.setText(null);
+		cedulaText.setText(null);
+		fecha_nac.setDate(global.obtenerFechaActual());
+		area.setText(null);
+		telefono.setText(null);
+		area2.setText(null);
+		telefono2.setText(null);
+		direccionText.setText(null);
+		fecha_insc.setDate(global.obtenerFechaActual());
+		nombreEmerText.setText(null);
+		areaEmer.setText(null);
+		telefonoEmer.setText(null);
+	}
+}
