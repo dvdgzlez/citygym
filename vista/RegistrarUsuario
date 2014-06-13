@@ -1,0 +1,378 @@
+package vista;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import controlador.Validacion;
+import controlador.IntegerTextField;
+import controlador.LetterTextField;
+
+public class RegistrarUsuario {
+
+	public static Global global = new Global();
+
+	/*
+	 * Esta función crea la interfaz gráfica para el Registro de Nuevos Usuarios
+	 */
+	public void NuevoUsuario(final JFrame frameViejo) {
+		final JFrame frame = new JFrame("City Gym - Nuevo Usuario");
+		frame.setContentPane(new JLabel(new ImageIcon("Imagenes/background2.png")));
+		frame.setSize(340, 300);
+		frame.setDefaultCloseOperation(1);
+		placeComponents(frame, frameViejo);
+		frame.setVisible(true);
+		Centrar centrar = new Centrar();
+		centrar.centreWindow(frame);
+		frame.setResizable(false);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				frame.setVisible(false);
+				frameViejo.setVisible(true);
+			}
+
+		});
+	}// fin de la función NuevoUsuario
+
+	/*
+	 * Esta función coloca en pantalla los campos para Nombre, Apellido, C.I.,
+	 * Usuario, Contraseña, Validar Contraseña Además de los eventos de los
+	 * botones Registrar y Volver
+	 */
+
+	static JButton registrarButton = new JButton(global.registro1());
+	static JButton volverButton = new JButton(global.volver1());
+	static JLabel warn_1 = new JLabel();
+	static JLabel warn_2 = new JLabel();
+	static JLabel warn_3 = new JLabel();
+	static JLabel warn_4 = new JLabel();
+	static JLabel warn_5 = new JLabel();
+	static JLabel warn_6 = new JLabel();
+	
+	private static void placeComponents(final JFrame frame,
+			final JFrame frameViejo) {
+
+		frame.setLayout(null);
+
+		// Campo de Nombre
+		JLabel nombreLabel = new JLabel("Nombre");
+		nombreLabel.setForeground(global.colorPlateado());
+		nombreLabel.setBounds(10, 10, 120, 25);
+		frame.add(nombreLabel);
+
+		final LetterTextField nombreText = new LetterTextField(20);
+		nombreText.setBounds(140, 10, 160, 25);
+		nombreText.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(nombreText.getText().trim().equals("")){
+					nombreText.setText("");
+				}else{
+					warn_1.setIcon(null);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(nombreText);
+		
+		warn_1.setBounds(305, 10, 25, 25);
+		frame.add(warn_1);
+
+		// Campo de Apellido
+		JLabel apellidoLabel = new JLabel("Apellido");
+		apellidoLabel.setForeground(global.colorPlateado());
+		apellidoLabel.setBounds(10, 40, 120, 25);
+		frame.add(apellidoLabel);
+
+		final LetterTextField apellidoText = new LetterTextField(20);
+		apellidoText.setBounds(140, 40, 160, 25);
+		apellidoText.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(apellidoText.getText().trim().equals("")){
+					apellidoText.setText("");
+				}else{
+					warn_2.setIcon(null);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(apellidoText);
+		
+		warn_2.setBounds(305, 40, 25, 25);
+		frame.add(warn_2);
+
+		// Campo de C.I.
+		JLabel cedulaLabel = new JLabel("C.I.");
+		cedulaLabel.setForeground(global.colorPlateado());
+		cedulaLabel.setBounds(10, 70, 120, 25);
+		frame.add(cedulaLabel);
+
+		final String[] CI = { "V", "E" };
+		final JComboBox<?> cedula = new JComboBox<Object>(CI);
+		cedula.setSelectedIndex(0);
+		cedula.setBounds(140, 70, 50, 25);
+		frame.add(cedula);
+
+		JLabel guionLabel = new JLabel("-");
+		guionLabel.setForeground(global.colorPlateado());
+		guionLabel.setBounds(192, 70, 25, 25);
+		frame.add(guionLabel);
+
+		final IntegerTextField cedulaText = new IntegerTextField(10);
+		cedulaText.setBounds(200, 70, 100, 25);
+		cedulaText.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(cedulaText.getText().trim().equals("")){
+					cedulaText.setText("");
+				}else{
+					warn_3.setIcon(null);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(cedulaText);
+		
+		warn_3.setBounds(305, 70, 25, 25);
+		frame.add(warn_3);
+
+		JLabel userLabel = new JLabel("Usuario");
+		userLabel.setForeground(global.colorPlateado());
+		userLabel.setBounds(10, 100, 120, 25);
+		frame.add(userLabel);
+
+		final JTextField userText = new JTextField(20);
+		userText.setBounds(140, 100, 160, 25);
+		userText.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(userText.getText().trim().equals("")){
+					userText.setText("");
+				}else{
+					warn_4.setIcon(null);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(userText);
+		
+		warn_4.setBounds(305, 100, 25, 25);
+		frame.add(warn_4);
+
+		JLabel passwordLabel = new JLabel("Contraseña");
+		passwordLabel.setForeground(global.colorPlateado());
+		passwordLabel.setBounds(10, 130, 120, 25);
+		frame.add(passwordLabel);
+
+		final JPasswordField passwordText = new JPasswordField(20);
+		passwordText.setBounds(140, 130, 160, 25);
+		passwordText.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(new String(passwordText.getPassword()).trim().equals("")){
+					passwordText.setText("");
+				}else{
+					warn_5.setIcon(null);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(passwordText);
+		
+		warn_5.setBounds(305, 130, 25, 25);
+		frame.add(warn_5);
+
+		JLabel passwordLabel2 = new JLabel("Validar Contraseña");
+		passwordLabel2.setForeground(global.colorPlateado());
+		passwordLabel2.setBounds(10, 160, 120, 25);
+		frame.add(passwordLabel2);
+
+		final JPasswordField passwordText2 = new JPasswordField();
+		passwordText2.setBounds(140, 160, 160, 25);
+		passwordText2.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if(new String(passwordText2.getPassword()).trim().equals("")){
+					passwordText2.setText("");
+				}else{
+					warn_6.setIcon(null);
+				}
+			}
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(passwordText2);
+		
+		warn_6.setBounds(305, 160, 25, 25);
+		frame.add(warn_6);
+
+		botonImagen(registrarButton, 165, 200);
+		registrarButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				registrarButton.setIcon(global.registro1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				registrarButton.setIcon(global.registro3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				registrarButton.setIcon(global.registro1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				registrarButton.setIcon(global.registro2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				registrarButton.setIcon(global.registro2());Validacion v = new Validacion();
+				int validar = 0;
+				try {
+					validar = v.validarRegistro(nombreText, apellidoText,
+							CI[cedula.getSelectedIndex()], cedulaText,
+							userText, passwordText, passwordText2);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+
+				switch (validar) {
+				case 1: // No introdujo el nombre
+					warn_1.setIcon(global.warning());
+					nombreText.requestFocus();
+					break;
+				case 2: // No introdujo el apellido
+					warn_2.setIcon(global.warning());
+					apellidoText.requestFocus();
+					break;
+				case 3: // No introdujo la C.I.
+					warn_3.setIcon(global.warning());
+					cedulaText.requestFocus();
+					break;
+				case 4: // No introdujo usuario
+					warn_4.setIcon(global.warning());
+					userText.requestFocus();
+					break;
+				case 5: // No introdujo contraseña
+					warn_5.setIcon(global.warning());
+					passwordText.requestFocus();
+					break;
+				case 6: // No introdujo nuevamente la contraseña
+					warn_6.setIcon(global.warning());
+					passwordText2.requestFocus();
+					break;
+				case 7: // Contraseña no coincide
+					global.mensajePantalla(7);
+					passwordText.requestFocus();
+					break;
+				case 8: // Usuario ya existe
+					global.mensajePantalla(8);
+					userText.setText(null);
+					passwordText.setText(null);
+					passwordText2.setText(null);
+					break;
+				case 9: // C.I. ya registrada
+					global.mensajePantalla(9);
+					nombreText.setText(null);
+					apellidoText.setText(null);
+					cedulaText.setText(null);
+					userText.setText(null);
+					passwordText.setText(null);
+					passwordText2.setText(null);
+					break;
+				case 99:// Error desconocido
+					global.mensajePantalla(99);
+					break;
+				default: // Registro Satisfactorio
+					frame.setVisible(false);
+					global.mensajePantalla(100);
+					frameViejo.setVisible(true);
+				}
+			}
+		});
+		frame.add(registrarButton);
+
+		botonImagen(volverButton, 20, 200);
+		volverButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				volverButton.setIcon(global.volver3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				volverButton.setIcon(global.volver2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				volverButton.setIcon(global.volver2());
+			}
+		});
+		frame.add(volverButton);
+
+		volverButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				frame.setVisible(false);
+				frameViejo.setVisible(true);
+			}
+		});
+	}// fin de la función placeComponents
+	public static void botonImagen(JButton boton, int x, int y) {
+		boton.setBounds(x, y, 150, 50);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		boton.setFocusable(true);
+		boton.setFocusPainted(false);
+	}
+}
