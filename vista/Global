@@ -1,0 +1,267 @@
+package vista;
+
+import java.awt.Color;
+import java.util.Date;
+
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
+import com.toedter.calendar.JDateChooser;
+
+public class Global {
+	private Color bgColor = new Color(16, 16, 142);
+	private Date fecha = new Date();
+	private Color verde_oscuro = new Color(117, 213, 21);
+	private Color plateado = new Color(224, 213, 224);
+	private Color rojo_oscuro = new Color(219, 17, 28);
+
+	private ImageIcon img_1_1 = new ImageIcon("Imagenes/inscribir_1.png");
+	private ImageIcon img_1_2 = new ImageIcon("Imagenes/inscribir_2.png");
+	private ImageIcon img_1_3 = new ImageIcon("Imagenes/inscribir_3.png");
+	private ImageIcon img_4_1 = new ImageIcon("Imagenes/reportes_1.png");
+	private ImageIcon img_4_2 = new ImageIcon("Imagenes/reportes_2.png");
+	private ImageIcon img_4_3 = new ImageIcon("Imagenes/reportes_3.png");
+	private ImageIcon img_bg1 = new ImageIcon("Imagenes/background.png");
+	private ImageIcon img_bg2 = new ImageIcon("Imagenes/background2.png");
+
+	private ImageIcon button_1_1 = new ImageIcon("Imagenes/button_iniciar.png");
+	private ImageIcon button_1_2 = new ImageIcon(
+			"Imagenes/button_iniciar_1.png");
+	private ImageIcon button_1_3 = new ImageIcon(
+			"Imagenes/button_iniciar_2.png");
+	private ImageIcon button_2_1 = new ImageIcon(
+			"Imagenes/button_registrar.png");
+	private ImageIcon button_2_2 = new ImageIcon(
+			"Imagenes/button_registrar_1.png");
+	private ImageIcon button_2_3 = new ImageIcon(
+			"Imagenes/button_registrar_2.png");
+	private ImageIcon button_3_1 = new ImageIcon("Imagenes/button_volver.png");
+	private ImageIcon button_3_2 = new ImageIcon("Imagenes/button_volver_1.png");
+	private ImageIcon button_3_3 = new ImageIcon("Imagenes/button_volver_2.png");
+	private ImageIcon button_4_1 = new ImageIcon(
+			"Imagenes/button_inscribir.png");
+	private ImageIcon button_4_2 = new ImageIcon(
+			"Imagenes/button_inscribir_1.png");
+	private ImageIcon button_4_3 = new ImageIcon(
+			"Imagenes/button_inscribir_2.png");
+	private ImageIcon button_5_1 = new ImageIcon("Imagenes/button_guardar.png");
+	private ImageIcon button_5_2 = new ImageIcon(
+			"Imagenes/button_guardar_1.png");
+	private ImageIcon button_5_3 = new ImageIcon(
+			"Imagenes/button_guardar_2.png");
+	private ImageIcon button_6_1 = new ImageIcon("Imagenes/button_agregar.png");
+	private ImageIcon button_6_2 = new ImageIcon(
+			"Imagenes/button_agregar_1.png");
+	private ImageIcon button_6_3 = new ImageIcon(
+			"Imagenes/button_agregar_2.png");
+	private ImageIcon button_7_1 = new ImageIcon("Imagenes/button_pagar.png");
+	private ImageIcon button_7_2 = new ImageIcon("Imagenes/button_pagar_1.png");
+	private ImageIcon button_7_3 = new ImageIcon("Imagenes/button_pagar_2.png");
+
+	private ImageIcon bg_inscripcion = new ImageIcon("Imagenes/inscripcion.png");
+	private ImageIcon bg_socio = new ImageIcon("Imagenes/socio.png");
+
+	private ImageIcon warning = new ImageIcon("Imagenes/warning.png");
+
+	public Color colorBG() {
+		return bgColor;
+	}
+
+	public Color colorVerdeOscuro() {
+		return verde_oscuro;
+	}
+
+	public Color colorPlateado() {
+		return plateado;
+	}
+
+	public Color colorRojoOscuro() {
+		return rojo_oscuro;
+	}
+
+	public ImageIcon inscribir1() {
+		return img_1_1;
+	}
+
+	public ImageIcon inscribir2() {
+		return img_1_2;
+	}
+
+	public ImageIcon inscribir3() {
+		return img_1_3;
+	}
+
+	public ImageIcon reporte1() {
+		return img_4_1;
+	}
+
+	public ImageIcon reporte2() {
+		return img_4_2;
+	}
+
+	public ImageIcon reporte3() {
+		return img_4_3;
+	}
+
+	public ImageIcon bg_1() {
+		return img_bg1;
+	}
+
+	public ImageIcon bg_2() {
+		return img_bg2;
+	}
+
+	public ImageIcon inicio1() {
+		return button_1_1;
+	}
+
+	public ImageIcon inicio2() {
+		return button_1_2;
+	}
+
+	public ImageIcon inicio3() {
+		return button_1_3;
+	}
+
+	public ImageIcon registro1() {
+		return button_2_1;
+	}
+
+	public ImageIcon registro2() {
+		return button_2_2;
+	}
+
+	public ImageIcon registro3() {
+		return button_2_3;
+	}
+
+	public ImageIcon volver1() {
+		return button_3_1;
+	}
+
+	public ImageIcon volver2() {
+		return button_3_2;
+	}
+
+	public ImageIcon volver3() {
+		return button_3_3;
+	}
+
+	public ImageIcon boton_inscribir1() {
+		return button_4_1;
+	}
+
+	public ImageIcon boton_inscribir2() {
+		return button_4_2;
+	}
+
+	public ImageIcon boton_inscribir3() {
+		return button_4_3;
+	}
+
+	public ImageIcon guardar1() {
+		return button_5_1;
+	}
+
+	public ImageIcon guardar2() {
+		return button_5_2;
+	}
+
+	public ImageIcon guardar3() {
+		return button_5_3;
+	}
+
+	public ImageIcon agregar1() {
+		return button_6_1;
+	}
+
+	public ImageIcon agregar2() {
+		return button_6_2;
+	}
+
+	public ImageIcon agregar3() {
+		return button_6_3;
+	}
+
+	public ImageIcon pagar1() {
+		return button_7_1;
+	}
+
+	public ImageIcon pagar2() {
+		return button_7_2;
+	}
+
+	public ImageIcon pagar3() {
+		return button_7_3;
+	}
+
+	public ImageIcon warning() {
+		return warning;
+	}
+
+	public ImageIcon bgInscripcion() {
+		return bg_inscripcion;
+	}
+
+	public ImageIcon bgSocio() {
+		return bg_socio;
+	}
+
+	/*
+	 * FECHAS
+	 */
+	public java.sql.Date obtenerFechaActual() {
+		java.sql.Date sql_fecha = new java.sql.Date(fecha.getTime());
+		return sql_fecha;
+	}
+
+	public java.sql.Date formatearFecha(JDateChooser fecha) {
+		long fecha_exacta = fecha.getCalendar().getTimeInMillis();
+		java.sql.Date sql_fecha = new java.sql.Date(fecha_exacta);
+		return sql_fecha;
+	}
+
+	public void mensajePantalla(int numero) {
+		switch (numero) {
+		case 1:
+			JOptionPane.showMessageDialog(null, "Ingrese el nombre");
+			break;
+		case 2:
+			JOptionPane.showMessageDialog(null, "Ingrese el apellido");
+			break;
+		case 3:
+			JOptionPane.showMessageDialog(null, "Ingrese la cedula");
+			break;
+		case 4:
+			JOptionPane.showMessageDialog(null, "Ingrese el nombre de usuario");
+			break;
+		case 5:
+			JOptionPane.showMessageDialog(null, "Ingrese la contraseña");
+			break;
+		case 6:
+			JOptionPane.showMessageDialog(null,
+					"Ingrese la contraseña nuevamente");
+			break;
+		case 7:
+			JOptionPane.showMessageDialog(null, "No coinciden las contraseñas");
+			break;
+		case 8:
+			JOptionPane.showMessageDialog(null, "Ya existe el usuario");
+			break;
+		case 9:
+			JOptionPane.showMessageDialog(null, "C.I. ya registrada");
+			break;
+
+		case 99:
+			JOptionPane.showMessageDialog(null, "Error desconocido");
+			break;
+		case 100:
+			JOptionPane.showMessageDialog(null, "Registro exitoso");
+			break;
+		case 102:
+			JOptionPane.showMessageDialog(null, "Pago registrado exitosamente");
+			break;
+			
+		}
+	}
+}
