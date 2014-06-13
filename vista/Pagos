@@ -1,0 +1,595 @@
+package vista;
+
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
+
+import modelo.DAO;
+import modelo.Sesion;
+import modelo.Socio;
+import controlador.Bancos;
+import controlador.Diferencia;
+import controlador.IntegerTextField;
+import controlador.JTextFieldLimit;
+import controlador.Refrescar;
+import controlador.Validacion;
+
+public class Pagos {
+	private static int ancho = 450;
+	private static int alto = 600;
+	private static int pos_x = 50;
+	private static int pos_y = 60;
+	private static JFrame frame = new JFrame();
+	private static JFrame frameViejo = new JFrame();
+	private static Global global = new Global();
+	private static DAO mc = new DAO();
+	private static Diferencia diferencia = new Diferencia();
+
+	private static ArrayList<Socio> socio_unico = new ArrayList<Socio>();
+	private static Socio socio = new Socio();
+	private static Refrescar refrescar = new Refrescar(0);
+	private static Bancos bancos = new Bancos();
+	private static int usuario = 0;
+	private static int cedula = 0;
+	private static String nacionalidad = new String();
+	private static String textoConcepto = new String();
+	private static String conceptoFinal = new String();
+
+	private final static JRadioButton efectivo = new JRadioButton("Efectivo");
+	private final static JRadioButton cheque = new JRadioButton("Cheque");
+	private final static JComboBox<?> textoBanco = new JComboBox<Object>(
+			bancos.deVenezuela());
+	private final static JComboBox<?> textoMeses = new JComboBox<Object>(
+			mesesAPagar());
+	private final static IntegerTextField textoCheque = new IntegerTextField(13);
+	private static JFormattedTextField textoMonto = new JFormattedTextField();
+	private static JFormattedTextField textoMontoInsc = new JFormattedTextField();
+	private static JButton pagarButton = new JButton(global.pagar1());
+	private static JButton volverButton = new JButton(global.volver1());
+	private static JLabel warn_1 = new JLabel();
+	private static JLabel warn_2 = new JLabel();
+	private static JLabel warn_3 = new JLabel();
+
+	public void mensualidad(JFrame frameViejo, String nacionalidad,
+			String cedula) {
+		Sesion sesion = new Sesion();
+		usuario = sesion.obtenerCedula();
+		conceptoFinal = "Mensualidad";
+		Pagos.frameViejo = frameViejo;
+		refrescar.conTimer(frame);
+		buscarUsuario(nacionalidad, cedula);
+		iniciarComponentes(frameViejo, 1);
+		colocarFicha(1);
+		colocarMensualidad();
+		colocarBotones(1);
+	}
+
+	public void inscripcionMensualidad(JFrame frameViejo, String nacionalidad,
+			String cedula, int i) {
+		Sesion sesion = new Sesion();
+		usuario = sesion.obtenerCedula();
+		conceptoFinal = "Inscripción|Mensualidad";
+		Pagos.frameViejo = frameViejo;
+		refrescar.conTimer(frame);
+		buscarUsuario(nacionalidad, cedula);
+		iniciarComponentes(frameViejo, i);
+		colocarFicha(i);
+		colocarInscripcion();
+		colocarMensualidad();
+		colocarBotones(i);
+	}
+
+	private static void buscarUsuario(String nac, String ced) {
+		nacionalidad = nac;
+		cedula = Integer.parseInt(ced);
+
+		try {
+			socio_unico = mc.obtenerSocio(nacionalidad,
+					Integer.toString(cedula));
+			socio = socio_unico.get(0);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void colocarFicha(int j) {
+		JLabel labelNombre = new JLabel("Nombre Socio: "
+				+ socio.obtenerNombre() + " " + socio.obtenerApellido());
+		labelNombre.setBounds(pos_x, pos_y,
+				labelNombre.getPreferredSize().width, 25);
+		labelNombre.setForeground(global.colorPlateado());
+		frame.add(labelNombre);
+		pos_y += 30;
+
+		JLabel labelCedula = new JLabel("C.I.: " + socio.obtenerNacionalidad()
+				+ "-" + socio.obtenerCedula());
+		labelCedula.setBounds(pos_x, pos_y,
+				labelCedula.getPreferredSize().width, 25);
+		labelCedula.setForeground(global.colorPlateado());
+		frame.add(labelCedula);
+
+		if (j != 0) {
+			pos_y += 30;
+
+			java.util.Date hoy = new java.util.Date();
+			int resta = diferencia.enMes(
+					socio.obtenerFechaCorte(socio.obtenerCedula()),
+					new Date(hoy.getTime()));
+			StringBuffer debe = new StringBuffer();
+			if (resta < 0) {
+				debe = new StringBuffer("0");
+			} else {
+				debe = new StringBuffer(Integer.toString(resta+1));
+			}
+
+			JLabel labelDebe = new JLabel("Meses que debe: " + debe.toString());
+			labelDebe.setBounds(pos_x, pos_y,
+					labelDebe.getPreferredSize().width, 25);
+			labelDebe.setForeground(global.colorPlateado());
+			frame.add(labelDebe);
+		}
+		pos_y += 50;
+
+		efectivo.setBounds(pos_x, pos_y, efectivo.getPreferredSize().width, 25);
+		efectivo.setOpaque(false);
+		efectivo.setForeground(global.colorVerdeOscuro());
+		efectivo.setBorderPainted(false);
+		efectivo.setSelected(true);
+		frame.add(efectivo);
+		cheque.setBounds(pos_x + efectivo.getPreferredSize().width + 30, pos_y,
+				cheque.getPreferredSize().width, 25);
+		cheque.setOpaque(false);
+		cheque.setForeground(global.colorVerdeOscuro());
+		cheque.setBorderPainted(false);
+		frame.add(cheque);
+		ButtonGroup group = new ButtonGroup();
+		group.add(efectivo);
+		group.add(cheque);
+		pos_y += 30;
+
+		JLabel banco = new JLabel("Banco");
+		banco.setBounds(pos_x, pos_y, 100, 25);
+		banco.setForeground(global.colorPlateado());
+		frame.add(banco);
+
+		textoBanco.setSelectedIndex(0);
+		textoBanco.setBounds(pos_x + 70, pos_y,
+				textoBanco.getPreferredSize().width, 25);
+		frame.add(textoBanco);
+		pos_y += 30;
+
+		JLabel nCheque = new JLabel("N° Cheque");
+		nCheque.setBounds(pos_x, pos_y, 100, 25);
+		nCheque.setForeground(global.colorPlateado());
+		frame.add(nCheque);
+
+		textoCheque.setBounds(pos_x + 70, pos_y, 100, 25);
+		textoCheque.setDocument(new JTextFieldLimit(13));
+		textoCheque.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (textoCheque.getText().trim().isEmpty()) {
+					textoCheque.setText("");
+				} else {
+					warn_1.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(textoCheque);
+		warn_1.setBounds(pos_x + 200, pos_y, 25, 25);
+		frame.add(warn_1);
+		pos_y += 50;
+		textoBanco.setEnabled(false);
+		textoCheque.setEnabled(false);
+
+		efectivo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				textoBanco.setEnabled(false);
+				textoCheque.setEnabled(false);
+			}
+		});
+		cheque.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				textoBanco.setEnabled(true);
+				textoCheque.setEnabled(true);
+			}
+		});
+	}
+
+	private static void colocarMensualidad() {
+		JLabel monto = new JLabel("Monto");
+		monto.setBounds(pos_x, pos_y, 100, 25);
+		monto.setForeground(global.colorPlateado());
+		frame.add(monto);
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+		dfs.setDecimalSeparator('.'); // separator for the decimals
+		DecimalFormat dFormat = new DecimalFormat("#####.##", dfs);
+		textoMonto = new JFormattedTextField(dFormat);
+		textoMonto.setBounds(pos_x + 70, pos_y, 80, 25);
+		textoMonto.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (textoMonto.getText().trim().isEmpty()) {
+					textoMonto.setText("");
+				} else {
+					textoMonto.setText(textoMonto.getText().replace(",", "."));
+					warn_2.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(textoMonto);
+		warn_2.setBounds(pos_x + 200, pos_y, 25, 25);
+		frame.add(warn_2);
+		pos_y += 30;
+
+		textoConcepto = "Mensualidad";
+		JLabel concepto = new JLabel("Concepto: " + textoConcepto);
+		concepto.setBounds(pos_x, pos_y, concepto.getPreferredSize().width, 25);
+		concepto.setForeground(global.colorPlateado());
+		frame.add(concepto);
+		pos_y += 30;
+
+		JLabel meses = new JLabel("Meses a Pagar: ");
+		meses.setBounds(pos_x, pos_y, meses.getPreferredSize().width, 25);
+		meses.setForeground(global.colorPlateado());
+		frame.add(meses);
+
+		textoMeses.setSelectedIndex(0);
+		textoMeses.setBounds(pos_x + meses.getPreferredSize().width + 30,
+				pos_y, textoMeses.getPreferredSize().width, 25);
+		frame.add(textoMeses);
+
+		pos_y += 60;
+	}
+
+	private static void colocarInscripcion() {
+		JLabel monto = new JLabel("Monto");
+		monto.setBounds(pos_x, pos_y, 100, 25);
+		monto.setForeground(global.colorPlateado());
+		frame.add(monto);
+		DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+		dfs.setDecimalSeparator('.'); // separator for the decimals
+		DecimalFormat dFormat = new DecimalFormat("#####.##", dfs);
+		textoMontoInsc = new JFormattedTextField(dFormat);
+		textoMontoInsc.setBounds(pos_x + 70, pos_y, 80, 25);
+		textoMontoInsc.setDocument(new JTextFieldLimit(7));
+		textoMontoInsc.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (textoMontoInsc.getText().trim().isEmpty()) {
+					textoMontoInsc.setText("");
+				} else {
+					textoMontoInsc.setText(textoMontoInsc.getText().replace(
+							",", "."));
+					warn_3.setIcon(null);
+				}
+			}
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+			}
+		});
+		frame.add(textoMontoInsc);
+		warn_3.setBounds(pos_x + 200, pos_y, 25, 25);
+		frame.add(warn_3);
+		pos_y += 30;
+
+		textoConcepto = "Inscripción";
+		JLabel concepto = new JLabel("Concepto: " + textoConcepto);
+		concepto.setBounds(pos_x, pos_y, concepto.getPreferredSize().width, 25);
+		concepto.setForeground(global.colorPlateado());
+		frame.add(concepto);
+		pos_y += 60;
+
+	}
+
+	private static void colocarBotones(final int i) {
+		botonImagen(pagarButton, 225, pos_y);
+		pagarButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				pagarButton.setIcon(global.pagar1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				pagarButton.setIcon(global.pagar3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				pagarButton.setIcon(global.pagar1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				pagarButton.setIcon(global.pagar2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				pagarButton.setIcon(global.pagar2());
+				validarCampos(i);
+			}
+		});
+		frame.add(pagarButton);
+
+		botonImagen(volverButton, 75, pos_y);
+		volverButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				volverButton.setIcon(global.volver3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				volverButton.setIcon(global.volver2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				volverButton.setIcon(global.volver1());
+				frame.setVisible(false);
+				frameViejo.setVisible(true);
+				frame.dispose();
+				borrarCampos(textoMonto, textoMontoInsc, textoCheque);
+			}
+		});
+		frame.add(volverButton);
+	}
+
+	private static void iniciarComponentes(final JFrame frameViejo, int i) {
+		pos_x = 50;
+		pos_y = 70;
+		frame.setSize(ancho, alto);
+		frame.setLayout(null);
+		if (i == 2) {
+			frame.setDefaultCloseOperation(1);
+		} else {
+			frame.setDefaultCloseOperation(i);
+		}
+		frame.setVisible(true);
+		Centrar centrar = new Centrar();
+		centrar.centreWindow(frame);
+		if (i == 1 || i == 2) {
+			frame.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					frame.setVisible(false);
+					frameViejo.setVisible(true);
+				}
+
+			});
+		}
+		frame.setResizable(false);
+		frame.setContentPane(new JLabel(global.bg_2()));
+		JLabel tituloLabel = new JLabel("Ficha de Pago", SwingConstants.CENTER);
+		tituloLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+		tituloLabel.setForeground(global.colorVerdeOscuro());
+		tituloLabel.setBounds(0, 20, ancho, 25);
+		frame.add(tituloLabel);
+	}
+
+	private static String[] mesesAPagar() {
+		String[] meses = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+				"11", "12" };
+		return meses;
+	}
+
+	private static void botonImagen(JButton boton, int x, int y) {
+		boton.setBounds(x, y, 150, 50);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		boton.setFocusable(true);
+		boton.setFocusPainted(false);
+	}
+
+	private static void validarCampos(int i) {
+		Validacion v = new Validacion();
+		int validar = 0;
+		String banco_elegido = new String();
+		String numCheque_elegido = new String();
+		if (efectivo.isSelected()) {
+			banco_elegido = "";
+			numCheque_elegido = "";
+			if (i == 0 || i == 2) {
+				validar = v.validarPago1_1(textoMonto, textoMontoInsc); // Valido
+																		// Inscripcion
+				// y Mensualidad
+			} else {
+				validar = v.validarPago2_1(textoMonto); // Valido
+														// Mensualidad
+			}
+		} else {
+			banco_elegido = bancos.deVenezuela()[textoBanco.getSelectedIndex()];
+			numCheque_elegido = textoCheque.getText();
+
+			if (i == 0 || i == 2) {
+				validar = v.validarPago1_2(textoMonto, textoMontoInsc,
+						textoCheque); // Valido
+										// Inscripcion
+				// y Mensualidad con
+				// Banco
+			} else {
+				validar = v.validarPago2_2(textoMonto, textoCheque); // Valido
+																		// Mensualidad
+				// con Banco
+			}
+		}
+		switch (validar) {
+		case 1: // No introdujo el numero de cheque
+			warn_1.setIcon(global.warning());
+			textoCheque.requestFocus();
+			break;
+		case 2: // No introdujo el monto de inscripcion
+			warn_3.setIcon(global.warning());
+			textoMontoInsc.requestFocus();
+			break;
+		case 3: // No introdujo el monto de mensualidad
+			warn_2.setIcon(global.warning());
+			textoMonto.requestFocus();
+			break;
+		case 99:// Error desconocido
+			global.mensajePantalla(99);
+			break;
+		default: // Validación Satisfactoria
+			int dialogButton = JOptionPane.YES_NO_OPTION;
+			int dialogResult = JOptionPane.showConfirmDialog(null,
+					"¿Realizar pago?", "Mensaje", dialogButton);
+			if (dialogResult == JOptionPane.YES_OPTION) {
+				frame.setVisible(false);
+
+				float valorMensualidad = Float.parseFloat(textoMonto.getText());
+				float valorInscripcion = 0;
+				if (i == 0 || i == 2) {
+					valorInscripcion = Float.parseFloat(textoMontoInsc
+							.getText());
+				}
+				long cheque = 0;
+				if (!numCheque_elegido.isEmpty()) {
+					cheque = Long.parseLong(numCheque_elegido);
+				}
+				Date fecha_pago = fechaActual();
+				Date fecha_inicio = null;
+				System.out.println(i + " - " + cedula);
+				if (i == 0) {
+					fecha_inicio = fechaInscripcion(cedula);
+				} else if (i == 1) {
+					fecha_inicio = fechaCorteAnterior(cedula);
+				} else if (i == 2) {
+					fecha_inicio = fechaActual();
+					try {
+						mc.actualizarSocioReintegro(cedula, fecha_inicio);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+				System.out.println(fecha_inicio);
+				Date fecha_corte = sumarMes(fecha_inicio,
+						Integer.parseInt(mesesAPagar()[textoMeses
+								.getSelectedIndex()]), cedula);
+
+				try {
+					mc.guardarPago(usuario, cedula, valorMensualidad,
+							valorInscripcion, cheque, banco_elegido,
+							fecha_pago, fecha_inicio, fecha_corte,
+							conceptoFinal);
+					global.mensajePantalla(102);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				borrarCampos(textoMonto, textoMontoInsc, textoCheque);
+				frame.setVisible(false);
+				frame.dispose();
+				frameViejo.dispose();
+				ListaSocios lista = new ListaSocios();
+				try {
+					lista.mostrarListado(frameViejo, 1);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private static Date sumarMes(Date fecha_inicio, int i, int ced) {
+		Calendar cal = new GregorianCalendar();
+		Calendar cal2 = new GregorianCalendar();
+		Date sqlInscripcion = fechaInscripcion(ced);
+		cal.setTime(fecha_inicio);
+		cal2.setTime(sqlInscripcion);
+		cal.add(Calendar.MONTH, i);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int day2 = cal2.get(Calendar.DAY_OF_MONTH);
+		if (day != day2) {
+			day2 -= day;
+			cal.add(Calendar.DAY_OF_MONTH, day2);
+		}
+		java.util.Date utilDate = cal.getTime();
+		Date sqlDate = new Date(utilDate.getTime());
+		return sqlDate;
+	}
+
+	private static Date fechaActual() {
+		java.util.Date hoy = new java.util.Date();
+		Date sqlDate = new Date(hoy.getTime());
+		return sqlDate;
+	}
+
+	private static Date fechaInscripcion(int ced) {
+		Date sqlDate = null;
+		try {
+			sqlDate = mc.obtenerSocioFechaInsc(ced);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return sqlDate;
+	}
+
+	private static Date fechaCorteAnterior(int ced) {
+		Date sqlDate = null;
+		try {
+			sqlDate = mc.obtenerInformeFechaCorte(ced);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return sqlDate;
+	}
+
+	private static void borrarCampos(JFormattedTextField textoMonto,
+			JFormattedTextField textoMontoInsc, IntegerTextField textoCheque) {
+		textoCheque.setText(null);
+		textoMontoInsc.setText(null);
+		textoMonto.setText(null);
+	}
+}
