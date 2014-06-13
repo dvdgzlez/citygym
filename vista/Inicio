@@ -1,0 +1,207 @@
+package vista;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.sql.SQLException;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import controlador.Validacion;
+
+public class Inicio {
+
+	private static final Principal ventana = new Principal();
+	public static Global global = new Global();
+
+	public void inicio_sesion() {
+		JFrame frame = new JFrame("City Gym - Inicio de Sesión");
+		frame.setContentPane(new JLabel(new ImageIcon(
+				"Imagenes/background2.png")));
+		frame.setResizable(false);
+		// frame.setLocationRelativeTo(null);
+		frame.setSize(300, 170);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		placeComponents(frame);
+
+		Centrar centrar = new Centrar();
+		centrar.centreWindow(frame);
+		frame.setVisible(true);
+		
+		CrearPDF crear = new CrearPDF();
+		crear.principal("primerPDF.pdf");
+	}
+
+	/*
+	 * Esta función coloca en pantalla los campos para Usuario y Contraseña
+	 * Además de los eventos de los botones Iniciar Sesión y Registrar
+	 */
+
+	static JButton loginButton = new JButton(global.inicio1());
+	static JButton registerButton = new JButton(global.registro1());
+
+	private static void placeComponents(final JFrame frame) {
+		frame.setLayout(null);
+
+		JLabel userLabel = new JLabel("Usuario");
+		userLabel.setForeground(global.colorPlateado());
+		userLabel.setBounds(10, 10, 80, 25);
+		frame.add(userLabel);
+
+		final JTextField userText = new JTextField(20);
+		userText.setBounds(100, 10, 160, 25);
+		frame.add(userText);
+
+		JLabel passwordLabel = new JLabel("Contraseña");
+		passwordLabel.setForeground(global.colorPlateado());
+		passwordLabel.setBounds(10, 40, 80, 25);
+		frame.add(passwordLabel);
+
+		final JPasswordField passwordText = new JPasswordField(20);
+		passwordText.setBounds(100, 40, 160, 25);
+		passwordText.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Validacion v = new Validacion();
+				try {
+					if (!v.validar(userText, passwordText)) {
+						userText.setText(null);
+						passwordText.setText(null);
+					} else {
+						// llamo a la ventana principal
+						frame.setVisible(false);
+						frame.dispose();
+						ventana.principal();
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		frame.add(passwordText);
+
+		botonImagen(loginButton, 145, 80);
+		loginButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				loginButton.setIcon(global.inicio1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				loginButton.setIcon(global.inicio3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				loginButton.setIcon(global.inicio1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				loginButton.setIcon(global.inicio2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				loginButton.setIcon(global.inicio2());
+			}
+		});
+		frame.add(loginButton);
+
+		botonImagen(registerButton, 0, 80);
+		registerButton.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				registerButton.setIcon(global.registro1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				registerButton.setIcon(global.registro3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				registerButton.setIcon(global.registro1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				registerButton.setIcon(global.registro2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				registerButton.setIcon(global.registro2());
+			}
+		});
+		frame.add(registerButton);
+
+		ActionListener loginButtonListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Validacion v = new Validacion();
+				try {
+					if (!v.validar(userText, passwordText)) {
+						userText.setText(null);
+						passwordText.setText(null);
+					} else {
+						// llamo a la ventana principal
+						frame.setVisible(false);
+						ventana.principal();
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+
+		};
+		loginButton.addActionListener(loginButtonListener);
+
+		passwordText.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Validacion v = new Validacion();
+				try {
+					if (!v.validar(userText, passwordText)) {
+						userText.setText(null);
+						passwordText.setText(null);
+					} else {
+
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		registerButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				RegistrarUsuario registrar = new RegistrarUsuario();
+				frame.setVisible(false);
+				registrar.NuevoUsuario(frame);
+			}
+		});
+	}// fin de la funci�n placeComponents
+
+	public static void botonImagen(JButton boton, int x, int y) {
+		boton.setBounds(x, y, 150, 50);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		boton.setFocusable(true);
+		boton.setFocusPainted(false);
+	}
+
+}
