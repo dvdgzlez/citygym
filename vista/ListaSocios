@@ -1,0 +1,550 @@
+package vista;
+
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
+import modelo.DAO;
+import modelo.Socio;
+import controlador.Diferencia;
+import controlador.Refrescar;
+
+public class ListaSocios {
+
+	private static JFrame frame = new JFrame();
+	private static DAO mc = new DAO();
+	private static Global global = new Global();
+	private static Diferencia diferencia = new Diferencia();
+	private static Inscribir inscribir = new Inscribir();
+	private static Object[] columnaSocios = { "Cedula", "Nombre", "Apellido",
+			"Telefono", "Estatus" };
+	private static JButton boton_agregar = new JButton(global.agregar1());
+	private static ArrayList<Socio> lista_socio = new ArrayList<Socio>();
+	private static Refrescar refrescar = new Refrescar(0);
+	private static Frame framePosterior = null;
+	private static JFrame frameViejox = null;
+	private static Principal v = new Principal();
+	private static Pagos pagar = new Pagos();
+	private static EditarSocio editar = new EditarSocio();
+
+	public void mostrarListado(final JFrame frameViejo, int i)
+			throws SQLException {
+		frameViejox = frameViejo;
+		iniciarComponentes(frameViejo, i);
+		colocarTabla();
+	}
+
+	private static void colocarTabla() throws SQLException {
+		lista_socio = mc.obtenerInscritos();
+		Object[][] data = new Object[lista_socio.size()][columnaSocios.length];
+
+		JLabel tituloLabel = new JLabel("Lista de Socios",
+				SwingConstants.CENTER);
+		tituloLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+		tituloLabel.setForeground(global.colorVerdeOscuro());
+		tituloLabel.setBounds(0, 20, 600, 25);
+		frame.add(tituloLabel);
+		frame.repaint();
+
+		if (lista_socio.size() == 0) {
+			int dialogButton = JOptionPane.YES_NO_OPTION;
+			int dialogResult = JOptionPane.showConfirmDialog(null,
+					"¿Ingresar nuevo Socio?", "Mensaje", dialogButton);
+			if (dialogResult == JOptionPane.YES_OPTION) {
+				frame.setVisible(false);
+				if (framePosterior == null) {
+					framePosterior = inscribir.Nuevo(frame);
+				} else {
+					framePosterior.setVisible(true);
+				}
+				frame.revalidate();
+			} else {
+				frame.setVisible(false);
+				frameViejox.setVisible(true);
+			}
+		} else {
+			for (int i = 0; i < lista_socio.size(); i++) {
+				Socio socio = new Socio();
+				socio = lista_socio.get(i);
+				StringBuffer estatus = new StringBuffer();
+				StringBuffer cedula = new StringBuffer(socio
+						.obtenerNacionalidad().toString()
+						+ "-"
+						+ socio.obtenerCedula());
+				Date hoy = new Date();
+				int resta = diferencia.enMes(new Date(hoy.getTime()),
+						socio.obtenerFechaCorte(socio.obtenerCedula()));
+				if (socio.obtenerEstatus() && (resta == -1)) {
+					estatus = new StringBuffer("En mora");
+				} else if (socio.obtenerEstatus() && (resta >= 0)) {
+					estatus = new StringBuffer("Al día");
+				} else {
+					estatus = new StringBuffer("Inactivo");
+				}
+				data[i][0] = cedula.toString();
+				data[i][1] = socio.obtenerNombre().toString();
+				data[i][2] = socio.obtenerApellido().toString();
+				data[i][3] = socio.obtenerTelefono1().toString();
+				data[i][4] = estatus.toString();
+			}
+		}
+		TableModel model = new DefaultTableModel(data, columnaSocios) {
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+
+			public Class<?> getColumnClass(int columna) {
+				Class<?> returnValue;
+				Object value = this.getValueAt(0, columna);
+				if ((value != null) && (columna >= 0)
+						&& (columna < getColumnCount())) {
+					returnValue = getValueAt(0, columna).getClass();
+				} else {
+					return (value == null ? Object.class : value.getClass());
+				}
+				return returnValue;
+			}
+		};
+		final JTable table = new JTable(model);
+		final TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(
+				model);
+
+		JMenuItem menu_1 = new JMenuItem("Pagar Mensualidad");
+		JMenuItem menu_2 = new JMenuItem("Editar Socio");
+		JMenuItem menu_3 = new JMenuItem("Ver pagos");
+		JMenuItem menu_2_1 = new JMenuItem("Editar Socio");
+		JMenuItem menu_3_1 = new JMenuItem("Ver pagos");
+		JMenuItem menu_4 = new JMenuItem("Dar de alta");
+		JMenuItem menu_5 = new JMenuItem("Dar de baja");
+
+		final JPopupMenu popupMenu = new JPopupMenu();
+		popupMenu.add(menu_1);
+		popupMenu.addSeparator();
+		popupMenu.add(menu_2);
+		popupMenu.add(menu_3);
+		popupMenu.add(menu_5);
+		final JPopupMenu popupMenu2 = new JPopupMenu();
+		popupMenu2.add(menu_2_1);
+		popupMenu2.add(menu_3_1);
+		popupMenu2.add(menu_4);
+
+		menu_1.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				frame.setVisible(false);
+				pagar.mensualidad(frame, arreglo[0], arreglo[1]);
+			}
+		});
+		menu_2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				frame.setVisible(false);
+				frame.dispose();
+				editar.socio(frame, Integer.parseInt(arreglo[1]));
+			}
+		});
+		menu_3.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				verPagos(arreglo[0], arreglo[1]);
+			}
+		});
+		menu_2_1.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				frame.setVisible(false);
+				frame.dispose();
+				editar.socio(frame, Integer.parseInt(arreglo[1]));
+			}
+		});
+		menu_3_1.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				verPagos(arreglo[0], arreglo[1]);
+			}
+		});
+		menu_4.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				int dialogButton = JOptionPane.YES_NO_OPTION;
+				int dialogResult = JOptionPane.showConfirmDialog(null,
+						"¿Desea dar de alta?", "Mensaje", dialogButton);
+				if (dialogResult == JOptionPane.YES_OPTION) {
+					frame.setVisible(false);
+					pagar.inscripcionMensualidad(frame, arreglo[0], arreglo[1],
+							2);
+				}
+			}
+		});
+		menu_5.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int r = table.getSelectedRow();
+				Object sb = table.getValueAt(r, 0);
+				String[] arreglo = sb.toString().split("-");
+				int dialogButton = JOptionPane.YES_NO_OPTION;
+				int dialogResult = JOptionPane.showConfirmDialog(null,
+						"¿Desea dar de baja?", "Mensaje", dialogButton);
+				if (dialogResult == JOptionPane.YES_OPTION) {
+					try {
+						mc.actualizarSocioBaja(Integer.parseInt(arreglo[1]));
+					} catch (NumberFormatException | SQLException e1) {
+						e1.printStackTrace();
+					}
+					frame.dispose();
+					ListaSocios lista = new ListaSocios();
+					try {
+						lista.mostrarListado(frameViejox, 1);
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+
+		table.setRowSorter(sorter);
+		table.setForeground(global.colorBG());
+		table.setOpaque(false);
+		table.setRowHeight(25);
+		table.setBounds(30, 50, 520, 380);
+		table.setFillsViewportHeight(true);
+
+		table.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(java.awt.event.MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					int r = table.rowAtPoint(e.getPoint());
+					if (r >= 0 && r < table.getRowCount()) {
+						table.setRowSelectionInterval(r, r);
+					} else {
+						table.clearSelection();
+					}
+					if (r < 0) {
+						return;
+					} else {
+						int r2 = table.getSelectedRow();
+						Object sb = table.getValueAt(r2, 4);
+						if (sb.equals("Al día") || sb.equals("En mora")) {
+							popupMenu.show(e.getComponent(), e.getX(), e.getY());
+						} else {
+							popupMenu2.show(e.getComponent(), e.getX(),
+									e.getY());
+						}
+					}
+				}
+
+			}
+
+			@Override
+			public void mousePressed(java.awt.event.MouseEvent e) {
+			}
+
+			@Override
+			public void mouseExited(java.awt.event.MouseEvent e) {
+			}
+
+			@Override
+			public void mouseEntered(java.awt.event.MouseEvent e) {
+			}
+
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+			}
+		});
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		// table.setComponentPopupMenu(popupMenu);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setOpaque(false);
+		scroll.setBounds(30, 50, 520, 380);
+		frame.add(scroll);
+
+		funcionBotonAgregar();
+
+		/*
+		 * Filtro para la tabla
+		 */
+		JLabel filtroText = new JLabel("Filtro");
+		filtroText.setFont(new Font("Serif", Font.PLAIN, 20));
+		filtroText.setForeground(global.colorVerdeOscuro());
+		filtroText.setBounds(250, 460, 100, 20);
+		frame.add(filtroText);
+
+		final JRadioButton cedula_button = new JRadioButton("Socio");
+		cedula_button.setBounds(300, 460,
+				cedula_button.getPreferredSize().width, 25);
+		cedula_button.setBorderPainted(false);
+		cedula_button.setOpaque(false);
+		cedula_button.setForeground(global.colorVerdeOscuro());
+		cedula_button.setSelected(true);
+		frame.add(cedula_button);
+		final JRadioButton estatus_button = new JRadioButton("Estatus");
+		estatus_button.setBounds(
+				300 + cedula_button.getPreferredSize().width + 30, 460,
+				estatus_button.getPreferredSize().width, 25);
+		estatus_button.setOpaque(false);
+		estatus_button.setForeground(global.colorVerdeOscuro());
+		estatus_button.setBorderPainted(false);
+		frame.add(estatus_button);
+		final JRadioButton todos_button = new JRadioButton("Todos");
+		todos_button.setBounds(300 + cedula_button.getPreferredSize().width
+				+ estatus_button.getPreferredSize().width + 60, 460,
+				todos_button.getPreferredSize().width, 25);
+		todos_button.setOpaque(false);
+		todos_button.setForeground(global.colorVerdeOscuro());
+		todos_button.setBorderPainted(false);
+		frame.add(todos_button);
+
+		final ButtonGroup group = new ButtonGroup();
+		group.add(cedula_button);
+		group.add(estatus_button);
+		group.add(todos_button);
+
+		final TableRowSorter<TableModel> sorter1 = new TableRowSorter<TableModel>(
+				model);
+		table.setRowSorter(sorter1);
+		sorter1.toggleSortOrder(1);
+
+		final JPanel panel = new JPanel();
+		panel.setBounds(250, 490, 300, 50);
+		panel.setOpaque(false);
+		frame.add(panel);
+		final JTextField textoFiltro = new JTextField(25);
+		textoFiltro.setBounds(5, 5, 100, 25);
+		textoFiltro.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				StringBuffer sb = new StringBuffer(textoFiltro.getText());
+				sorter1.setRowFilter(RowFilter.regexFilter("(?i)"
+						+ sb.toString()));
+
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+
+			}
+		});
+
+		final JRadioButton alDia = new JRadioButton("Al día");
+		alDia.setBounds(0, 0, alDia.getPreferredSize().width, 25);
+		alDia.setBorderPainted(false);
+		alDia.setOpaque(false);
+		alDia.setForeground(global.colorVerdeOscuro());
+		alDia.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				StringBuffer sb = new StringBuffer(alDia.getActionCommand());
+				sorter1.setRowFilter(RowFilter.regexFilter(sb.toString()));
+			}
+		});
+		final JRadioButton enMora = new JRadioButton("En mora");
+		enMora.setBounds(0, 30, enMora.getPreferredSize().width, 25);
+		enMora.setOpaque(false);
+		enMora.setForeground(global.colorVerdeOscuro());
+		enMora.setBorderPainted(false);
+		enMora.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				StringBuffer sb = new StringBuffer(enMora.getActionCommand());
+				sorter1.setRowFilter(RowFilter.regexFilter(sb.toString()));
+			}
+		});
+		final JRadioButton inactivo = new JRadioButton("Inactivo");
+		inactivo.setBounds(0, 60, inactivo.getPreferredSize().width, 25);
+		inactivo.setOpaque(false);
+		inactivo.setForeground(global.colorVerdeOscuro());
+		inactivo.setBorderPainted(false);
+		inactivo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				StringBuffer sb = new StringBuffer(inactivo.getActionCommand());
+				sorter1.setRowFilter(RowFilter.regexFilter(sb.toString()));
+			}
+		});
+
+		panel.add(textoFiltro);
+
+		final ButtonGroup group2 = new ButtonGroup();
+		group2.add(alDia);
+		group2.add(enMora);
+		group2.add(inactivo);
+
+		cedula_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				refrescar.conTimer(frame);
+				panel.removeAll();
+				panel.add(textoFiltro);
+				// frame.add(textoFiltro);
+
+			}
+		});
+
+		estatus_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				refrescar.conTimer(frame);
+				panel.removeAll();
+				panel.add(alDia);
+				panel.add(enMora);
+				panel.add(inactivo);
+				// frame.add(textoFiltro);
+
+			}
+		});
+
+		todos_button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				refrescar.conTimer(frame);
+				sorter1.setRowFilter(null);
+				panel.removeAll();
+			}
+		});
+	}
+
+	private static void iniciarComponentes(final JFrame frameViejo, int i) {
+		refrescar.conTimer(frame);
+		frame.setSize(600, 600);
+		frame.setLayout(null);
+		frame.setDefaultCloseOperation(1);
+		frame.setVisible(true);
+		Centrar centrar = new Centrar();
+		centrar.centreWindow(frame);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				frame.setVisible(false);
+				frameViejo.dispose();
+				v.principal();
+			}
+
+		});
+		frame.setContentPane(new JLabel(global.bg_1()));
+	}
+
+	private static void funcionBotonAgregar() {
+		botonImagen(boton_agregar, 30, 410);
+		boton_agregar.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				boton_agregar.setIcon(global.agregar1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				boton_agregar.setIcon(global.agregar3());
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				boton_agregar.setIcon(global.agregar1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				boton_agregar.setIcon(global.agregar2());
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				boton_agregar.setIcon(global.agregar2());
+				frame.setVisible(false);
+				if (framePosterior == null) {
+					framePosterior = inscribir.Nuevo(frame);
+				} else {
+					framePosterior.setVisible(true);
+				}
+				frame.revalidate();
+			}
+		});
+		frame.add(boton_agregar);
+	}
+
+	private static void botonImagen(JButton boton, int x, int y) {
+		boton.setBounds(x, y, 160, 160);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		boton.setFocusable(true);
+		boton.setFocusPainted(false);
+	}
+	
+	private static void verPagos(String nacionalidad, String cedula){
+		frame.removeAll();
+		frame.revalidate();
+		frame.repaint();
+		refrescar.conTimer(frame);
+		iniciarComponentes(frameViejox, 1);
+	}
+}
