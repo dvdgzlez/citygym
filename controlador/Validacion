@@ -1,0 +1,237 @@
+package controlador;
+
+import java.sql.SQLException;
+import java.util.Date;
+
+import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import modelo.DAO;
+
+public class Validacion {
+
+	private static final DAO mc = DAO.getInstance();
+
+	public boolean validar(JTextField userText, JPasswordField passwordText)
+			throws SQLException {
+		StringBuilder contrasena = new StringBuilder(new String(
+				passwordText.getPassword()));
+		StringBuilder usuario = new StringBuilder(userText.getText());
+		// System.out.printf("%s\n%s\n", userText.getText(), contrase�a);
+		boolean validar = mc.validarUsuario(usuario.toString(),
+				contrasena.toString());
+		if (validar) {
+			mc.obtenerUsuario(usuario.toString());
+			return true;
+		} else {
+			JOptionPane
+					.showMessageDialog(null,
+							"Fallo de autenticación\nPor favor verifique el usuario y contraseña.");
+			return false;
+		}
+	}// fin de la funci�n validar
+
+	public int validarRegistro(JTextField nombre, JTextField apellido,
+			String nacionalidad, JTextField CI, JTextField usuario,
+			JPasswordField contrasena, JPasswordField v_contrasena)
+			throws SQLException {
+		StringBuilder valida_nombre = new StringBuilder(nombre.getText());
+		StringBuilder valida_apellido = new StringBuilder(apellido.getText());
+		StringBuilder valida_CI = new StringBuilder(CI.getText());
+		StringBuilder valida_usuario = new StringBuilder(usuario.getText());
+		StringBuilder valida_contrasena = new StringBuilder(new String(
+				contrasena.getPassword()));
+		StringBuilder valida_contrasena2 = new StringBuilder(new String(
+				v_contrasena.getPassword()));
+		try {
+			if (valida_nombre.toString().isEmpty()) {
+				return 1;
+			} else if (valida_apellido.toString().isEmpty()) {
+				return 2;
+			} else if (valida_CI.toString().isEmpty()) {
+				return 3;
+			} else if (valida_usuario.toString().isEmpty()) {
+				return 4;
+			} else if (valida_contrasena.toString().isEmpty()) {
+				return 5;
+			} else if (valida_contrasena2.toString().isEmpty()) {
+				return 6;
+			} else if (!valida_contrasena.toString().equals(
+					valida_contrasena2.toString())) {
+				return 7;
+			} else if (mc.existeUsuario(valida_usuario.toString()) == 1) {
+				return 8;
+			} else if (mc.existeCedula(valida_CI.toString()) == 1) {
+				return 9;
+			} else {
+				mc.crearUsuario(valida_nombre.toString(),
+						valida_apellido.toString(), nacionalidad,
+						valida_CI.toString(), valida_usuario.toString(),
+						valida_contrasena.toString());
+				return 0;
+			}
+		} catch (NullPointerException e) {
+			System.out.println("valor nulo en validación " + e);
+			return 99;
+		}
+
+	}// fin de la funci�n validarRegistro
+
+	public int validarInscripcion(JTextField nombre, JTextField apellido,
+			IntegerTextField cedula, String nacionalidad,
+			Date fecha_nacimiento, JTextArea direccion, String telefono,
+			String telefono2, JTextField nombre_emer, String telefonoEmer,
+			String sexo, Date fecha_inscripcion) throws SQLException {
+		StringBuffer valida_nombre = new StringBuffer(nombre.getText());
+		StringBuffer valida_apellido = new StringBuffer(apellido.getText());
+		StringBuffer valida_CI = new StringBuffer(cedula.getText());
+		StringBuffer valida_fecha_nacimiento = new StringBuffer(
+				fecha_nacimiento.toString());
+		StringBuffer valida_fecha_inscripcion = new StringBuffer(
+				fecha_inscripcion.toString());
+		StringBuffer valida_direccion = new StringBuffer(new String(
+				direccion.getText()));
+		StringBuffer valida_nombre_emer = new StringBuffer(new String(
+				nombre_emer.getText()));
+		try {
+			if (valida_nombre.toString().isEmpty()) {
+				return 1;
+			} else if (valida_apellido.toString().isEmpty()) {
+				return 2;
+			} else if (valida_CI.toString().isEmpty()) {
+				return 3;
+			} else if (valida_fecha_nacimiento.toString().isEmpty()) {
+				return 4;
+			} else if (telefono.equals("-")) {
+				return 5;
+			} else if (valida_fecha_inscripcion.toString().isEmpty()) {
+				return 6;
+			} else if (valida_nombre_emer.toString().isEmpty()) {
+				return 7;
+			} else if (telefonoEmer.equals("-")) {
+				return 8;
+			} else if (mc.existeInscrito(valida_CI.toString()) == 1) {
+				return 9;
+			} else {
+				mc.crearInscrito(valida_nombre.toString(),
+						valida_apellido.toString(), nacionalidad,
+						valida_CI.toString(),
+						valida_fecha_nacimiento.toString(), sexo, telefono,
+						telefono2, valida_direccion.toString(),
+						valida_fecha_inscripcion.toString(),
+						valida_nombre_emer.toString(), telefonoEmer);
+				return 0;
+			}
+		} catch (NullPointerException e) {
+			System.out.println("valor nulo en validación " + e);
+			return 99;
+		}
+
+	}// fin de la funci�n validarInscripcion
+
+	public int validarInscripcion2(JTextField nombre, JTextField apellido,
+			IntegerTextField cedula, String nacionalidad,
+			Date fecha_nacimiento, JTextArea direccion, String telefono,
+			String telefono2, JTextField nombre_emer, String telefonoEmer,
+			String sexo, Date fecha_inscripcion, int cedula_anterior) throws SQLException {
+		StringBuilder valida_nombre = new StringBuilder(nombre.getText());
+		StringBuilder valida_apellido = new StringBuilder(apellido.getText());
+		StringBuilder valida_CI = new StringBuilder(cedula.getText());
+		StringBuilder valida_fecha_nacimiento = new StringBuilder(
+				fecha_nacimiento.toString());
+		StringBuilder valida_fecha_inscripcion = new StringBuilder(
+				fecha_inscripcion.toString());
+		StringBuilder valida_direccion = new StringBuilder(new String(
+				direccion.getText()));
+		StringBuilder valida_nombre_emer = new StringBuilder(new String(
+				nombre_emer.getText()));
+		try {
+			if (valida_nombre.toString().isEmpty()) {
+				return 1;
+			} else if (valida_apellido.toString().isEmpty()) {
+				return 2;
+			} else if (valida_CI.toString().isEmpty()) {
+				return 3;
+			} else if (valida_fecha_nacimiento.toString().isEmpty()) {
+				return 4;
+			} else if (telefono.equals("-")) {
+				return 5;
+			} else if (valida_fecha_inscripcion.toString().isEmpty()) {
+				return 6;
+			} else if (valida_nombre_emer.toString().isEmpty()) {
+				return 7;
+			} else if (telefonoEmer.equals("-")) {
+				return 8;
+			} else if ((mc.existeInscrito(valida_CI.toString()) == 1 ) && (!valida_CI.toString().equals(Integer.toString(cedula_anterior)))) {
+				return 9;
+			} else {
+				mc.actualizarInscrito(valida_nombre.toString(),
+						valida_apellido.toString(), nacionalidad,
+						valida_CI.toString(),
+						valida_fecha_nacimiento.toString(), sexo, telefono,
+						telefono2, valida_direccion.toString(),
+						valida_fecha_inscripcion.toString(),
+						valida_nombre_emer.toString(), telefonoEmer, Integer.toString(cedula_anterior));
+				return 0;
+			}
+		} catch (NullPointerException e) {
+			System.out.println("valor nulo en validación " + e);
+			return 99;
+		}
+
+	}// fin de la funci�n validarInscripcion2
+
+	public int validarPago1_1(JFormattedTextField string1,
+			JFormattedTextField string2) {
+		StringBuilder s1 = new StringBuilder(new String(string1.getText()));
+		StringBuilder s2 = new StringBuilder(new String(string2.getText()));
+
+		if (s1.toString().isEmpty()) {
+			return 3;
+		} else if (s2.toString().isEmpty()) {
+			return 2;
+		}
+		return 0;
+	}
+
+	public int validarPago2_1(JFormattedTextField string1) {
+		StringBuilder s1 = new StringBuilder(new String(string1.getText()));
+
+		if (s1.toString().isEmpty()) {
+			return 3;
+		}
+		return 0;
+	}
+
+	public int validarPago1_2(JFormattedTextField string1,
+			JFormattedTextField string2, IntegerTextField string3) {
+		StringBuilder s1 = new StringBuilder(new String(string1.getText()));
+		StringBuilder s2 = new StringBuilder(new String(string2.getText()));
+		StringBuilder s3 = new StringBuilder(new String(string3.getText()));
+
+		if (s1.toString().isEmpty()) {
+			return 3;
+		} else if (s2.toString().isEmpty()) {
+			return 2;
+		} else if (s3.toString().isEmpty()) {
+			return 1;
+		}
+		return 0;
+	}
+
+	public int validarPago2_2(JFormattedTextField string1,
+			IntegerTextField string2) {
+		StringBuilder s1 = new StringBuilder(new String(string1.getText()));
+		StringBuilder s2 = new StringBuilder(new String(string2.getText()));
+
+		if (s1.toString().isEmpty()) {
+			return 3;
+		} else if (s2.toString().isEmpty()) {
+			return 1;
+		}
+		return 0;
+	}
+}// fin de la clase publica Validacion
