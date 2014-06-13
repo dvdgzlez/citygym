@@ -1,0 +1,47 @@
+package modelo;
+
+public class Sesion {
+
+	private static StringBuffer nombre = null;
+	private static StringBuffer apellido = null;
+	private static int cedula = 0;
+	private static StringBuffer usuario = null;
+
+	public Sesion() {
+
+	}
+
+	// Métodos Obtener!!
+	public StringBuffer obtenerNombre() {
+		return nombre;
+	}
+
+	public StringBuffer obtenerApellido() {
+		return apellido;
+	}
+
+	public int obtenerCedula() {
+		return cedula;
+	}
+
+	public StringBuffer obtenerUsuario() {
+		return usuario;
+	}
+
+	// Métodos Ingresar!!
+	public void ingresarNombre(StringBuffer valor) {
+		nombre = valor;
+	}
+
+	public void ingresarApellido(StringBuffer valor) {
+		apellido = valor;
+	}
+
+	public void ingresarCedula(int valor) {
+		cedula = valor;
+	}
+
+	public void ingresarUsuario(StringBuffer valor) {
+		usuario = valor;
+	}
+}
