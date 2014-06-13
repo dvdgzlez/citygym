@@ -1,0 +1,160 @@
+package vista;
+
+import java.awt.Font;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import modelo.DAO;
+import modelo.Sesion;
+import modelo.Socio;
+import controlador.Diferencia;
+
+public class Principal extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+	private static final DAO mc = new DAO();
+	private static final Diferencia diferencia = new Diferencia();
+	static ListaSocios lista_socios = new ListaSocios();
+	private ArrayList<Socio> lista_socio;
+
+	public void principal() {
+		JFrame frame = new JFrame("City Gym - Principal");
+		frame.setResizable(false);
+		// frame.setLocationRelativeTo(null);
+		frame.setSize(500, 500);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		placeComponents(frame);
+
+		Centrar centrar = new Centrar();
+		centrar.centreWindow(frame);
+		frame.setVisible(true);
+		try {
+			actualizarBasedeDatos();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void actualizarBasedeDatos() throws SQLException {
+		lista_socio = mc.obtenerInscritos();
+		if (lista_socio.size() != 0) {
+			for (int i = 0; i < lista_socio.size(); i++) {
+				Socio socio = new Socio();
+				socio = lista_socio.get(i);
+				Date hoy = new Date();
+				Date fecha_corte = socio.obtenerFechaCorte(socio
+						.obtenerCedula());
+				if (fecha_corte == null || fecha_corte.equals("")) {
+					mc.borrarSocio(socio.obtenerCedula());
+				} else {
+					int resta = diferencia.enMes(fecha_corte,
+							new Date(hoy.getTime()));
+					if (socio.obtenerEstatus() && resta >= 1) {
+						mc.actualizarSocioBaja(socio.obtenerCedula());
+					}
+				}
+			}
+		}
+	}
+
+	final static Global global = new Global();
+	static JButton boton_lista_socios = new JButton(global.inscribir1());
+	static JButton boton_reporte = new JButton(global.reporte1());
+
+	private static void placeComponents(final JFrame frame) {
+		frame.setLayout(null);
+		Sesion mc = new Sesion();
+		frame.setContentPane(new JLabel(global.bg_1()));
+
+		JLabel userLabel = new JLabel("Hola, " + mc.obtenerNombre());
+		userLabel.setBounds(10, 10, 80, 25);
+		userLabel.setForeground(global.colorVerdeOscuro());
+		userLabel.setFont(new Font("Serif", Font.PLAIN, 17));
+		frame.add(userLabel);
+
+		botonImagen(boton_lista_socios, 60, 60);
+		boton_lista_socios.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				boton_lista_socios.setIcon(global.inscribir1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				boton_lista_socios.setIcon(global.inscribir3());
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				boton_lista_socios.setIcon(global.inscribir1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				boton_lista_socios.setIcon(global.inscribir2());
+
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				boton_lista_socios.setIcon(global.inscribir2());
+				frame.setVisible(false);
+				ListaSocios lista = new ListaSocios();
+				try {
+					lista.mostrarListado(frame, 0);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		frame.add(boton_lista_socios);
+
+		botonImagen(boton_reporte, 280, 60);
+		boton_reporte.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				boton_reporte.setIcon(global.reporte1());
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				boton_reporte.setIcon(global.reporte3());
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				boton_reporte.setIcon(global.reporte1());
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				boton_reporte.setIcon(global.reporte2());
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				boton_reporte.setIcon(global.reporte2());
+			}
+		});
+		frame.add(boton_reporte);
+
+	}// fin de la función placeComponents
+
+	public static void botonImagen(JButton boton, int x, int y) {
+		boton.setBounds(x, y, 160, 160);
+		boton.setBorderPainted(false);
+		boton.setContentAreaFilled(false);
+		boton.setFocusable(true);
+		boton.setFocusPainted(false);
+	}
+}
