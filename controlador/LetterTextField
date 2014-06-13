@@ -1,0 +1,49 @@
+package controlador;
+
+import java.awt.event.KeyEvent;
+
+import javax.swing.JTextField;
+
+public class LetterTextField extends JTextField {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public LetterTextField(int i) {
+		super(i);
+	}
+
+	public LetterTextField(String s, int i) {
+		super(s, i);
+	}
+        @Override
+	protected void processKeyEvent(KeyEvent e) {
+
+		int key = e.getKeyCode();
+		if (key == KeyEvent.VK_BACK_SPACE || key == KeyEvent.VK_DELETE
+				|| key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
+			super.processKeyEvent(e);
+			return;
+		}
+
+		int keyChar = e.getKeyChar();
+		if ((keyChar >= 'a' && keyChar <= 'z')
+				|| (keyChar >= 'A' && keyChar <= 'Z') || keyChar == '\n'
+				|| keyChar == ' ' || keyChar == 'á' || keyChar == 'Á'
+				|| keyChar == 'é' || keyChar == 'É' || keyChar == 'í'
+				|| keyChar == 'Í' || keyChar == 'ó' || keyChar == 'Ó'
+				|| keyChar == 'ú' || keyChar == 'Ú' || keyChar == 'ñ'
+				|| keyChar == 'Ñ' ||
+				// these next two are hardcoded backspace & delete
+				// which we seem to need for linux jdks
+				keyChar == (char) 8 || keyChar == (char) 127) {
+			super.processKeyEvent(e);
+		}
+
+		// System.out.println ("Ignoring keypress: " +
+		// ", keychar= " + keyChar);
+	}
+
+}
