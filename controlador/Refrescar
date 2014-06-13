@@ -1,0 +1,39 @@
+package controlador;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.Timer;
+
+public class Refrescar {
+	
+	private int inicio;
+	
+	public Refrescar(int i){
+		this.inicio = i;
+	}
+	
+	public void conTimer(final JFrame frame) {
+		Timer timer = new Timer(2, new ActionListener() {
+
+			private int i = inicio;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (this.i  == 0) {
+					frame.setExtendedState(JFrame.NORMAL);
+					this.i++;
+				}
+			}
+		});
+		timer.start();
+		frame.setExtendedState(JFrame.ICONIFIED);
+	}
+	
+	public void tabla(final JFrame frame) {
+		frame.dispose();
+		
+	}
+}
+
